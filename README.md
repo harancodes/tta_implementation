@@ -1,68 +1,116 @@
-# Lookit – E-Commerce Website
 
-A full-stack e-commerce web application with product browsing, cart, orders, and admin management.
+# Lookit – E-Commerce Website (Two-Tier Architecture on AWS EKS)
 
-🌐 Live Site: https://lookit.abhinavashokm.site
+This project is based on a **Git clone of the original Lookit E-Commerce repository developed by Abhinav Ashok**.
 
----
+The purpose of cloning this project is **not to replicate the original deployment**, but to **use the application as a base to implement and demonstrate a production-style cloud architecture**.
 
-## 🚀 Features
-
-- User authentication (signup / login / logout)
-- Product listing with categories and filters
-- Cart and checkout flow
-- Order placement and order history
-- Coupon and discount system
-- Product reviews
-- Admin dashboard for managing products, orders, and users
-- Secure deployment with HTTPS
+In this implementation, the application is redesigned and deployed using a **Two-Tier Architecture on AWS Elastic Kubernetes Service (EKS)** to explore scalable DevOps practices.
 
 ---
 
-## 🛠 Tech Stack
+## Project Purpose
 
-**Frontend**
-- HTML, CSS, JavaScript
+The original repository provides a **full-stack Django e-commerce application**.
+This cloned version is used as a **reference application to implement infrastructure architecture and DevOps workflows**.
 
-**Backend**
-- Python
-- Django
-- Gunicorn
+Key goals of this implementation:
 
-**Database**
-- PostgreSQL
-
-**Server & Deployment**
-- AWS EC2 (Linux)
-- Nginx (Reverse Proxy)
-- SSL via Certbot (Let’s Encrypt)
+* Deploy the application using **containerized workloads**
+* Implement **Two-Tier Architecture**
+* Run the system on **AWS EKS (Kubernetes)**
+* Demonstrate **cloud-native deployment practices**
 
 ---
 
-## 📸 Screenshots
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/0d593695-63f3-4406-bcc4-960e477bbdba" />
+## Architecture Overview
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/7ddc460f-8c0f-4325-87e9-b02e2e9a3f13" />
+This implementation follows a **Two-Tier Architecture**:
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/bcb5c8f1-2161-4308-a98d-c35a43a8f88c" />
+### 1️⃣ Application Tier
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/ee0557e5-65fa-4000-aff1-a978cd5fbd39" />
+Handles application logic and user requests.
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/3f8aba4a-f4ae-4952-8f8b-cb3b7964259e" />
+Components:
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/a2b318d7-4184-4943-8933-0918d4194b19" />
+* Django Application
+* Gunicorn Application Server
+* Nginx (reverse proxy)
+* Docker containers
+* Kubernetes Pods running on AWS EKS
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/8690ace1-2be2-4fc6-9750-0dea555a2929" />
+Responsibilities:
 
-<img width="1920" height="934" alt="image" src="https://github.com/user-attachments/assets/a59a4def-50ce-4d7d-bbd1-67f215776617" />
-
-
+* Process user requests
+* Handle authentication
+* Manage product catalog, cart, orders, and coupons
+* Serve frontend templates
 
 ---
 
-## ⚙️ Installation & Setup
+### 2️⃣ Data Tier
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/your-username/lookit.git
-cd lookit
+Handles persistent storage and database operations.
+
+Components:
+
+* PostgreSQL Database
+* Persistent storage
+* Kubernetes service for database access
+
+Responsibilities:
+
+* Store product data
+* Manage user accounts
+* Handle orders and transactions
+* Maintain application state
+
+---
+
+## Technology Stack
+
+### Frontend
+
+* HTML
+* CSS
+* JavaScript
+* Django Templates
+
+### Backend
+
+* Python
+* Django
+* Gunicorn
+
+### Database
+
+* PostgreSQL
+
+### Containerization
+
+* Docker
+
+### Container Orchestration
+
+* Kubernetes
+* AWS EKS
+
+### Infrastructure & Deployment
+
+* AWS EKS
+* Nginx (Reverse Proxy)
+* Kubernetes Services & Deployments
+* SSL via Certbot (Let's Encrypt)
+
+---
+
+## Key DevOps Concepts Implemented
+
+* Containerized application using **Docker**
+* Kubernetes deployments and services
+* Two-tier application architecture
+* Scalable infrastructure using **AWS EKS**
+* Reverse proxy using **Nginx**
+* Secure HTTPS deployment
+* Infrastructure-ready project structure
+
