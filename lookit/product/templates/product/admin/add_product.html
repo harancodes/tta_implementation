@@ -1,0 +1,354 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'product/admin/css/add_product.css' %}">
+
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-products' %}">Products</a>
+        <span>/</span>
+        <span>Add Product</span>
+    </div>
+
+    <!-- Page Title -->
+    <h1 class="page-title">Add New Product</h1>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <form id="addProductForm" method="post" enctype="multipart/form-data" action="{% url 'admin-add-product' %}">
+            {% csrf_token %}
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h2 class="section-title">Basic Information</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="productName">Product Name</label>
+                        <input type="text" name="name" id="productName" name="productName"
+                            placeholder="Enter Product Name">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"
+                            placeholder="Enter product description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Brand</label>
+                        <input type="text" id="brand" name="brand" placeholder="Enter Brand Name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="colorBase">Color Base</label>
+                        <select id="colorBase" name="base_color">
+                            <option value="" disabled selected>Name for filtering</option>
+                            {% for value, label in color_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="form-section">
+                <h2 class="section-title">Category</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="" disabled selected>Select Category</option>
+                            <option value="men">Men</option>
+                            <option value="women">Women</option>
+                            <option value="kids">Kids</option>
+                            <!-- <option value="unisex">Unisex</option> -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Style</label>
+                        <select id="type" class="select2" name="style">
+                            <option value="" disabled selected>Select Style</option>
+                            {% for style in styles %}
+                            <option value="{{ style.name }}">{{ style.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-section">
+                <h2 class="section-title optional">Additional Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="material">Material</label>
+                        <input type="text" id="material" name="material" placeholder="Enter material">
+                    </div>
+                    <div class="form-group">
+                        <label for="fit">Fit</label>
+                        <input type="text" id="fit" name="fit" placeholder="Enter fit">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="careInstructions">Care Instructions</label>
+                        <input type="text" id="careInstructions" name="care_instructions"
+                            placeholder="Enter care instructions">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="form-section">
+                <h2 class="section-title">Price</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="basePrice">Price</label>
+                        <input type="number" id="basePrice" name="price" placeholder="Enter Price" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images & Media -->
+            <div class="form-section">
+                <h2 class="section-title">Images & Media</h2>
+                <div class="form-grid">
+
+                    <!--THUMBNAIL IMAGE-->
+                    <div class="form-group full-width">
+                        <label>Upload Thumbnail Image <span style="color: #ef4444;">*</span></label>
+
+                        <!--file input-->
+                        <div class="upload-area" id="thumbnailUpload"
+                            onclick="document.getElementById('thumbnailInput').click()">
+                            <div class="upload-text">Drag and drop or click to upload</div>
+                            <button type="button" class="upload-btn">Upload Image</button>
+                            <input type="file" name="image" id="thumbnailInput" accept="image/*" style="display: none;"
+                                onchange="handleThumbnailUpload(event)">
+                        </div>
+
+                        <div class="validation-message" id="thumbnailValidationMessage">Please upload exactly one
+                            thumbnail image</div>
+
+                        <!--thumbnail image preview-->
+                        <div class="thumbnail-preview-container" id="thumbnailPreviewContainer" style="display: none;">
+                            <div class="thumbnail-preview">
+                                <img id="thumbnailPreviewImg" src="" alt="Thumbnail Preview">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!--ADDITIONAL IMAGES-->
+                    <div class="form-group full-width">
+                        <label>Upload Additional Images <span style="color: #ef4444;">*</span> (Minimum 2 and Maximum 5
+                            images)</label>
+
+                        <div class="upload-area" id="additionalUpload"
+                            onclick="document.getElementById('additionalInput').click()">
+                            <div class="upload-text">Drag and drop or click to upload multiple images</div>
+                            <button type="button" class="upload-btn">Upload Images</button>
+                            <input type="file" name="additional_images" id="additionalInput" accept="image/*" multiple
+                                style="display: none;" onchange="handleAdditionalUpload(event)">
+                        </div>
+
+                        <div class="validation-message" id="additionalValidationMessage">Please upload minimum 2 and maximum 5
+                            additional images</div>
+                        <div class="images-count" id="additionalImagesCount">0 images uploaded</div>
+
+                        <div class="additional-images-grid" id="additionalImagesGrid"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{% url 'admin-list-products' %}">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </a>
+                <button type="submit" class="btn-save">Save Product</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<!-- jQuery (required for Select2, style searching) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="{% static 'product/admin/js/add_product.js' %}"></script>
+
+<!--form validation-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script>
+    $.validator.addMethod("letterswithspaces", function (value, element) {
+        return this.optional(element) || /^[A-Za-z\s]+$/.test(value);
+    }, "Only letters and spaces allowed");
+
+    $.validator.addMethod("positiveNumber", function (value, element) {
+        return this.optional(element) || Number(value) > 0;
+    }, "Please enter a valid price");
+
+    $(document).ready(function () {
+
+        $("#addProductForm").validate({
+            //ignore: [], // IMPORTANT: validates hidden fields like file inputs
+
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 100
+                },
+                description: {
+                    required: true,
+                    minlength: 10,
+                },
+                brand: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 50,
+                    letterswithspaces: true
+                },
+                base_color: {
+                    required: true
+                },
+                category: {
+                    required: true
+                },
+                style: {
+                    required: true
+                },
+                material: {
+                    minlength: 2,
+                    maxlength: 50,
+                },
+                fit: {
+                    minlength: 2,
+                    maxlength: 50,
+                },
+                care_instructions: {
+                    maxlength: 150
+                },
+                price: {
+                    required: true,
+                    number: true,
+                    positiveNumber: true
+                },
+                // image: {
+                //     required: true,
+                //     accept: "image/*"
+                // },
+                // additional_images: {
+                //     required: true,
+                //     accept: "image/*"
+                // }
+            },
+
+            messages: {
+                name: {
+                    required: "Product name is required",
+                    minlength: "Enter at least 2 characters",
+                    maxlength: "Max 100 characters allowed"
+                },
+                description: {
+                    required: "Description is required",
+                    minlength: "Description must be at least 10 characters"
+                },
+                brand: {
+                    required: "Brand is required",
+                    minlength: "Brand must be at least 2 characters",
+                    maxlength: "Brand name too long",
+                    letterswithspaces: "Brand name can only contain letters"
+                },
+                base_color: {
+                    required: "Select a base color"
+                },
+                category: {
+                    required: "Select category"
+                },
+                style: {
+                    required: "Select style"
+                },
+                material: {
+                    minlength: "Minimum 2 characters",
+                    maxlength: "Maximum 50 characters"
+                },
+                fit: {
+                    minlength: "Minimum 2 characters",
+                    maxlength: "Maximum 50 characters"
+                },
+                care_instructions: {
+                    maxlength: "Max 150 characters allowed"
+                },
+                price: {
+                    required: "Price is required",
+                    number: "Enter a valid number",
+                    positiveNumber: "Price must be greater than 0"
+                },
+                // image: {
+                //     required: "Upload a thumbnail image",
+                //     accept: "Only image files allowed"
+                // },
+                // additional_images: {
+                //     required: "Upload at least 2 additional images",
+                //     accept: "Only image files allowed"
+                // }
+            },
+
+            errorClass: "error",
+            errorElement: "label",
+
+            errorPlacement: function (error, element) {
+                // Select2 dropdown
+                if (element.hasClass("select2-hidden-accessible")) {
+                    error.insertAfter(element.next(".select2"));
+                }
+                // File inputs
+                else if (element.attr("type") === "file") {
+                    error.appendTo(element.closest(".form-group"));
+                }
+                // Normal inputs
+                else {
+                    error.insertAfter(element);
+                }
+            },
+
+            submitHandler: function (form) {
+                // Custom validation for min additional images count
+                const additionalCount = document.getElementById('additionalInput').files.length;
+
+                if (thumbnailInput.files && thumbnailInput.files.length > 0) {
+                    console.log("Thumbnail selected");
+                } else {
+                    console.log("No thumbnail selected");
+                    return false
+                }
+
+                if (additionalCount < 2) {
+                    $("#additionalValidationMessage").text("Upload minimum 2 images").show();
+                    return false;
+                }else if(additionalCount > 5){
+                    $("#additionalValidationMessage").text("You can upload a maximum of 5 additional images.").show();
+                    return false;       
+                }
+
+                form.submit();
+            }
+
+        });
+
+    });
+</script>
+
+{% endblock %}

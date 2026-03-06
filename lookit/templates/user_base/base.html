@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/863/863684.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Lookit Ecommerse</title>
+    <!--Global CSS-->
+    <link rel="stylesheet" href="{% static 'user/css/base.css' %}">
+
+    <!--Components CSS-->
+    <link rel="stylesheet" href="{% static 'user/css/components/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'user/css/components/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'user/css/components/toast.css' %}">
+
+    <!-- Page-specific CSS -->
+    {% block styles %}{% endblock %}
+
+</head>
+
+<body>
+    <!-- Top Navbar -->
+    {% include 'user_base/components/navbar.html' %}
+
+    <!-- Main Content  -->
+    {% block content %}{% endblock %}
+
+    {% include 'user_base/components/footer.html' %}
+
+    <!-- toast for notification (temporarly used admin's toast) -->
+    {% include 'user_base/components/toast.html' %}
+
+    <!--Component JS-->
+    <script src="{% static 'user/js/components/navbar.js' %}"></script>
+    <script src="{% static 'user/js/components/toast.js' %}"></script>
+
+    <!-- Page-specific JS -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

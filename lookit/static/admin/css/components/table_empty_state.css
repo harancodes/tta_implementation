@@ -1,0 +1,23 @@
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon {
+    width: 60px;
+    height: 60px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+.empty-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #4b5563;
+}

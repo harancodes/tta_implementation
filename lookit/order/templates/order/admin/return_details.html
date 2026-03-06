@@ -1,0 +1,274 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/admin/return_details.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <!-- Breadcrumb + Title -->
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <a href="{% url 'admin-list-return-requests' %}">Return Requests</a>
+      <span>/</span>
+      <span>View Return</span>
+    </div>
+    <h1 class="page-title">Return Request Details</h1>
+  </div>
+
+  <div class="order-details-container">
+
+    <!-- 1️⃣ RETURN SUMMARY -->
+    <div class="order-card">
+      <div class="card-header">
+        <h2>Return Summary</h2>
+      </div>
+      <div class="card-body return-summary">
+        <div class="summary-row">
+          <span class="summary-label">Linked Order Id</span>
+          <span class="summary-value">#ORD-0123</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Amount Paid</span>
+          <span class="summary-value">₹{{ order.total }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Refund Method</span>
+          <span class="summary-value">Wallet</span>
+        </div>
+        <div class="summary-row status">
+          <span class="summary-label">Return Status</span>
+          <span class="status-badge status-approved">{{ return_request.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2️⃣ PRODUCT & ORDER DETAILS -->
+    <div class="order-card">
+      <div class="card-header">
+        <h2>Product Information</h2>
+      </div>
+      <div class="card-body">
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Variant</th>
+              <th>Quantity</th>
+              <th>Base Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img style="max-height: 75px;" src="{{ order.product.image_url }}" alt="Product"></td>
+              <td>{{ order.product.name }}</td>
+              <td>{{ order.variant.size }}</td>
+              <td>{{ order.quantity }}</td>
+              <td>₹{{ order.unit_price }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3️⃣ RETURN REASON & EVIDENCE -->
+    <div class="order-card">
+      <div class="card-header">
+        <h2><i class="fas fa-info-circle"></i> Return Reason & Evidence</h2>
+      </div>
+      <div class="card-body">
+        <div class="info-item">
+          <span class="info-label"><i class="fas fa-quote-left"></i> Reason</span>
+          <span class="info-value important">{{ return_request.reason }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label"><i class="fas fa-comment"></i> Customer Comments</span>
+          <span class="info-value">“{{ return_request.comments }}”</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label"><i class="fas fa-images"></i> Uploaded Images (up to 3)</span>
+          <div class="return-images">
+            {% if return_request.product_image1 %}
+                <img src="{{ return_request.product_image1 }}" alt="Return Image 1">
+            {% endif %}
+
+            {% if return_request.product_image2 %}
+                <img src="{{ return_request.product_image2 }}" alt="Return Image 2">
+            {% endif %}
+
+            {% if return_request.product_image3 %}
+                <img src="{{ return_request.product_image3 }}" alt="Return Image 3">
+            {% endif %}
+           
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4️⃣ PICKUP & CUSTOMER INFO -->
+    <div class="info-cards-container">
+      <!-- Pickup -->
+      <div class="info-card">
+        <div class="card-header">
+          <h2><i class="fas fa-map-marker-alt"></i> Pickup Address</h2>
+        </div>
+        <div class="card-body">
+          <div class="delivery-address">
+            <div class="address-line"><i class="fas fa-user"></i> {{ address.full_name }}</div>
+            <div class="address-line"><i class="fas fa-map"></i> {{ address.address_line }}</div>
+            <div class="address-line"><i class="fas fa-city"></i> {{ address.city }}, {{ address.state }}, {{ address.pincode }}</div>
+            <div class="address-line"><i class="fas fa-phone"></i> {{ address.phone }}{% if address.second_phone %}, {{ address.second_phone }}{% endif %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer -->
+      <div class="info-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user"></i> Customer Information</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-item"><span class="info-label">Name</span><span class="info-value">{{ customer.full_name }}</span></div>
+          <div class="info-item"><span class="info-label">Email</span><span class="info-value">{{ customer.email }}</span></div>
+          <div class="info-item"><span class="info-label">Phone</span><span class="info-value">{% if customer.phone %}{{ customer.phone }}{% else %}Not Provided{% endif %}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5️⃣ RETURN PROGRESS -->
+    <div class="order-card">
+      <div class="card-header">
+        <h2><i class="fas fa-tasks"></i> Return Progress</h2>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h4>Return Requested</h4>
+              <p>{{ return_request.request_date|date:"d M Y, h:i A" }}</p>
+            </div>
+          </div>
+          {% if return_request.status != 'REJECTED' %}
+            <div class="timeline-item {% if return_request.status == 'APPROVED' %}active{% elif return_request.status == 'PICKED_UP' or return_request.status == 'REFUNDED' or return_request.status == 'PICKUP_SCHEDULED' %}completed{% endif %}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4>Approved</h4>
+                <p>{% if return_request.approved_at %}{{ return_request.approved_at|date:"d M Y, h:i A" }}{% else %}pending{% endif %}</p>
+              </div>
+            </div>
+            <div class="timeline-item {% if return_request.status == 'PICKUP_SCHEDULED' %}active{% elif return_request.status == 'REFUNDED' or return_request.status == 'PICKED_UP' %}completed{% endif %}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content"> 
+                <h4>Pickup Scheduled</h4>
+                <p>{% if return_request.pickup_scheduled_on %}{{ return_request.pickup_scheduled_on|date:"d M Y, h:i A" }}{% else %}pending{% endif %}</p>
+              </div>
+            </div>
+            <div class="timeline-item {% if return_request.status == 'PICKED_UP' %}active{% elif return_request.status == 'REFUNDED' %}completed{% endif %}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4>Pickup Completed</h4>
+                <p>{% if return_request.pickup_scheduled_for %}Scheduled For: {{ return_request.pickup_scheduled_for|date:"d M Y, h:i A" }}{% else %}pending{% endif %}</p>
+                <p style="margin-top: 3px;">{% if return_request.pickedup_at %}Completed On: {{ return_request.pickedup_at|date:"d M Y, h:i A" }}{% endif %}</p>
+              </div>
+            </div>
+            <div class="timeline-item {% if return_request.status == 'REFUNDED' %}completed{% endif %}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4>Refund Completed</h4>
+                <p>{% if return_request.refunded_at %}{{ return_request.refunded_at|date:"d M Y, h:i A" }}{% else %}pending{% endif %}</p>
+              </div>
+            </div>
+
+          {% else %}
+          <div class="timeline-item {% if return_request.status == 'REJECTED' %}rejected{% endif %}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                  <h4>Rejected</h4>
+                  <p>
+                      {% if return_request.rejected_at %}
+                          {{ return_request.rejected_at|date:"d M Y, h:i A" }}
+                      {% else %}
+                          Pending
+                      {% endif %}
+                  </p>
+              </div>
+          </div>
+
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 6️⃣ ADMIN ACTIONS -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="openStatusModal()">
+        <i class="fas fa-edit"></i> Change Return Status
+      </button>
+      <form action="{% url 'admin-update-return-status' return_request.uuid %}" method="post">
+        {% csrf_token %}
+        <input  type="hidden" name="return_status" value="REJECTED">
+
+        {% if return_request.status != 'REJECTED'  %}
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-times"></i> Reject Return
+        </button>
+        {% endif %}
+
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Update Return Status Modal -->
+<div id="statusModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>Update Return Status</h3>
+      <button class="close-btn" onclick="closeStatusModal()">&times;</button>
+    </div>
+
+    <form action="{% url 'admin-update-return-status' return_request.uuid %}" method="post">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="order-info">
+          <p><strong>Order ID:</strong> {{ order.uuid }}</p>
+          <p><strong>Product:</strong> {{ order.product.name }}</p>
+        </div>
+
+        <div class="form-group">
+          <label for="statusSelect">New Status</label>
+          <select name="return_status" id="statusSelect" class="form-control" required>
+            <option value="" disabled selected>Select status</option>
+            <option value="APPROVED" {% if return_request.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+            <option value="PICKUP_SCHEDULED" {% if return_request.status == 'PICKUP_SCHEDULED' %}selected{% endif %}>Pickup Scheduled</option>
+            <option value="PICKED_UP" {% if return_request.status == 'PICKED_UP' %}selected{% endif %}>Picked Up</option>
+            <option value="REFUNDED" {% if return_request.status == 'REFUNDED' %}selected{% endif %}>Refund Completed</option>
+            <option value="REJECTED" {% if return_request.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+
+        <!-- Pickup Date Field (hidden by default) -->
+        <div class="form-group" id="pickupDateGroup" style="display: none;">
+          <label for="pickupDate">Pickup Date</label>
+          <input type="date" name="pickup_date" id="pickupDate" class="form-control">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Status</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'order/js/admin/return_details.js' %}"></script>
+{% endblock %}

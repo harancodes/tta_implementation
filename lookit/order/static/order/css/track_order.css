@@ -1,0 +1,779 @@
+/* =========================================================
+   GLOBAL PAGE STRUCTURE
+========================================================= */
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.breadcrumb {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: '/';
+    margin: 0 0.5rem;
+    color: #9ca3af;
+}
+
+.breadcrumb a {
+    color: #6b7280;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+    color: #9a4d72;
+}
+
+.breadcrumb [aria-current="page"] {
+    color: #4b5563;
+    font-weight: 500;
+}
+
+/* =========================================================
+   ORDER CARD
+========================================================= */
+
+.order-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    padding: 2.5rem 3rem;
+    border: 1px solid #f0f0f0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ============================
+   ORDER STATUS BADGES - Modern UI
+============================ */
+.order-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-transform: capitalize;
+}
+
+/* ---------- PLACED ---------- */
+.order-status.placed {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.order-status.placed i {
+    color: #1565c0;
+}
+
+/* ---------- SHIPPED ---------- */
+.order-status.shipped {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.order-status.shipped i {
+    color: #2e7d32;
+}
+
+/* ---------- DELIVERED ---------- */
+.order-status.delivered {
+    background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
+    color: #1b5e20;
+    border: 1px solid #a5d6a7;
+}
+
+.order-status.delivered i {
+    color: #1b5e20;
+}
+
+/* ---------- CANCELLED ---------- */
+.order-status.order-cancelled {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.order-status.order-cancelled i {
+    color: #c62828;
+}
+
+/* Hover effect (optional) */
+.order-status:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+.order-meta {
+    text-align: right;
+}
+
+.meta-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.meta-value {
+    color: #2d3748;
+    font-weight: 500;
+}
+
+/* =========================================================
+   PRODUCT INFO
+========================================================= */
+
+.product-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2.5rem;
+    margin: 0 -1.5rem 2.5rem;
+    padding: 2rem 1.5rem;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+}
+
+.product-image {
+    width: 140px;
+    height: 170px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.product-details {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.product-meta {
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.product-meta span {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+/* =========================================================
+   PRICE + ADDRESS SECTIONS
+========================================================= */
+
+.order-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2.5rem;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.details-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2.5rem;
+    margin: 0 -1.5rem;
+}
+
+.delivery-address,
+.price-summary {
+    background: #f9fafb;
+    padding: 1.75rem;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.address-details {
+    line-height: 1.6;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+
+}
+
+.price-row.total {
+    font-weight: 600;
+    font-size: 1.2rem;
+    border-top: 2px solid #e5e7eb;
+    border-bottom: none;
+    padding-top: 1rem;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    background: #9a4d72;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #883d62;
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-danger:hover {
+    background: #fecaca;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 0 20px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .order-card {
+        padding: 1rem;
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .product-info {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .product-image {
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+    }
+
+    .details-row {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+/* =========================================================
+   💼 PROFESSIONAL PROGRESS TRACKER (Blue Active + Green Completed)
+========================================================= */
+
+/* Core color palette */
+:root {
+    --blue: #2563eb;            /* Active step color */
+    --blue-light: #3b82f6;
+    --green: #16a34a;           /* Completed step color */
+    --green-light: #4ade80;
+    --gray: #e5e7eb;            /* Inactive connector */
+    --text-gray: #6b7280;
+}
+
+/* Container */
+.order-progress {
+    width: 100%;
+    padding: 1.5rem 0;
+}
+
+.progress-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    /* gap: 1.5rem; */
+}
+
+/* Step base */
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 90px;
+    gap: 0.5rem;
+}
+
+/* Step circle */
+.step-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--gray);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.step-circle .inner {
+    color: #9ca3af;
+    font-weight: 700;
+}
+
+/* Text */
+.step-text .title {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.step-text .date {
+    font-size: 0.82rem;
+    color: var(--text-gray);
+}
+
+/* Connector line */
+.connector {
+    flex: 1;
+    height: 4px;
+    background: var(--gray);
+    border-radius: 4px;
+    position: relative;
+    top: 28px;
+    overflow: hidden;
+}
+
+.connector::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--green-light));
+    transition: width 0.5s ease, height 0.5s ease;
+}
+
+/* ===========================
+   🟢 Completed Steps
+=========================== */
+/* .progress-1 .step-placed .step-circle, */
+.progress-2 .step-placed .step-circle,
+.progress-3 .step-placed .step-circle,
+.progress-3 .step-shipped .step-circle,
+.progress-4 .step-placed .step-circle,
+.progress-4 .step-shipped .step-circle,
+.progress-4 .step-out .step-circle,
+.progress-4 .step-delivered .step-circle {
+    background: linear-gradient(180deg, var(--green), var(--green-light));
+    border-color: var(--green);
+}
+
+/* .progress-1 .step-placed .inner, */
+.progress-2 .step-placed .inner,
+.progress-3 .step-placed .inner,
+.progress-3 .step-shipped .inner,
+.progress-4 .step-placed .inner,
+.progress-4 .step-shipped .inner,
+.progress-4 .step-out .inner,
+.progress-4 .step-delivered .inner  {
+    color: #fff;
+}
+
+/* Connectors filled for completed */
+.progress-2 .c1::before { width: 100%; }
+.progress-3 .c1::before, .progress-3 .c2::before { width: 100%; }
+.progress-4 .c1::before, .progress-4 .c2::before, .progress-4 .c3::before { width: 100%; }
+
+/* ===========================
+   🔵 Active Step (Blue Highlight)
+=========================== */
+.step.active .step-circle {
+    background: #fff;
+    border: 4px solid var(--green); 
+    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2);
+    animation: pulseRingBlue 1.5s infinite ease-in-out;
+}
+
+.step.active .inner {
+    color: var(--green);
+    font-weight: 800;
+}
+
+/* .step.active .title {
+    color: var(--blue);
+    font-weight: 800;
+}
+
+.step.active .date {
+    color: var(--blue);
+} */
+
+/* Pulse animation for active step */
+@keyframes pulseRingBlue {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+}
+
+/* ===========================
+   ⚪ Inactive Steps
+=========================== */
+.step:not(.active) .step-circle {
+    border-color: var(--gray);
+}
+.step:not(.active) .title {
+    color: #374151;
+}
+.step:not(.active) .date {
+    color: var(--text-gray);
+}
+
+/* ===========================
+   📱 Responsive (Mobile)
+=========================== */
+@media (max-width: 720px) {
+    .progress-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding-left: 0.75rem;
+    }
+
+    .step {
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 0.75rem;
+    }
+
+    .step-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .connector {
+        width: 4px;
+        height: 50px;
+        margin-left: 24px;
+        top: 0;
+    }
+
+    .connector::before {
+        width: 100%;
+        height: 0%;
+    }
+
+    .progress-2 .c1::before { height: 100%; }
+    .progress-3 .c1::before, .progress-3 .c2::before { height: 100%; }
+    .progress-4 .c1::before, .progress-4 .c2::before, .progress-4 .c3::before { height: 100%; }
+}
+
+
+/* ==============================
+Modal Styles (CANCEL Modal)
+============================== */
+.danger_modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.danger_modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.danger_modal {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.danger_modal-overlay.show .danger_modal {
+    transform: scale(1);
+}
+
+.danger_modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.danger_modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.danger_modal-body {
+    padding: 24px;
+}
+
+.danger_modal-message {
+    font-size: 0.95rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.danger_modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.danger_modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Cancel Button */
+.danger_modal-btn-cancel {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.danger_modal-btn-cancel:hover {
+    background: #d1d5db;
+}
+
+/* Confirm (Delete) Button */
+.danger_modal-btn-confirm {
+    background: #ef4444;
+    color: white;
+}
+
+.danger_modal-btn-confirm:hover {
+    background: #dc2626;
+}
+
+
+/*ORDER STATUS CANCELLED*/
+.order-status-cancelled {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #ffeaea;
+    border: 1px solid #f5c2c7;
+    color: #b71c1c;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.order-status-cancelled i {
+    font-size: 1.8rem;
+    color: #b71c1c;
+}
+
+
+
+
+
+/* ==============================
+Modal Styles (Danger Modal)
+============================== */
+.danger_modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.danger_modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.danger_modal {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.danger_modal-overlay.show .danger_modal {
+    transform: scale(1);
+}
+
+.danger_modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.danger_modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.danger_modal-body {
+    padding: 24px;
+}
+
+.danger_modal-message {
+    font-size: 0.95rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.danger_modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.danger_modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Cancel Button */
+.danger_modal-btn-cancel {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.danger_modal-btn-cancel:hover {
+    background: #d1d5db;
+}
+
+/* Confirm (Danger) Button */
+.danger_modal-btn-confirm {
+    background: #ef4444;
+    color: white;
+}
+
+.danger_modal-btn-confirm:hover {
+    background: #dc2626;
+}
+
+.discount-price {
+    color: #28a745;
+}

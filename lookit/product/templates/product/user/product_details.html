@@ -1,0 +1,390 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'product/user/css/product_details.css' %}">
+
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+    <a href="{% url 'index' %}">Home</a>
+    <span>/</span>
+    <a href="{% url 'explore' %}?category={{ product.category }}">{{ product.category }}</a>
+    <span>/</span>
+    <span class="current">{{ product.name }}</span>
+</div>
+
+<!-- Product Details Container -->
+<div class="product-details-container">
+    <div class="product-main">
+        <!-- Left Side - Product Images -->
+        <div class="product-images">
+            <div class="product-images-wrapper">
+                <div class="thumbnail-images">
+
+                    <!--Main image as the first thumbnail image-->
+                    <div class="thumbnail active" onclick="changeImage(0, '{{ product.image_url }}')">
+                        {% if product.image_url != ' ' %}
+                        <img id="imageIndex0" src="{{ product.image_url }}" alt="">
+                        {% else %}
+                        <div
+                            style="width: 100%; height: 100%; background: linear-gradient(135deg, #4ecdc4, #ff8e53, #f5e6d3); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">
+                            Image 2</div>
+                        {% endif %}
+                    </div>
+
+                    {% for image in additional_product_images %}
+                    <div class="thumbnail" onclick="changeImage('{{ forloop.counter }}', '{{ image.image_url }}')">
+                        {% if image.image_url %}
+                        <!--I given two id's so previous and next works in modal image zoom-->
+                        <img id="imageIndex{{ forloop.counter }}" src="{{ image.image_url }}" alt="">
+                        {% else %}
+                        <div
+                            style="width: 100%; height: 100%; background: linear-gradient(135deg, #4ecdc4, #ff8e53, #f5e6d3); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">
+                            Image 2</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+                <div class="main-image-container">
+
+                    {% if product.image_url != ' ' %}
+                    <img class="main-image" id="mainImage" src="{{ product.image_url }}" alt="">
+                    {% else %}
+                    <div class="main-image" id="mainImage">
+                        <div
+                            style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff6b6b, #ff8e53, #333); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
+                            {{ product.name }}</div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="zoom-icon" onclick="openImageModal('{{ product.total_additional_images }}')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+            <div class="action-buttons-left">
+                <form action="{% url 'add-to-wishlist' %}" method="post" class="cart-form" id="addToWishlist">
+                    {% csrf_token %}
+                    <input name="product_uuid" type="hidden" value="{{ product.uuid }}">
+                    <button type="submit" class="btn-wishlist">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                        Add to Wishlist
+                    </button>
+                </form>
+
+                <form action="{% url 'add-to-cart' %}" method="post" class="cart-form" id="addToCartDesktop">
+                    {% csrf_token %}
+                    <input name="product_id" type="hidden" value="{{ product.id }}">
+                    <input type="hidden" name="quantity" value="1" id="hiddenQuantityInput">
+                    <input class="variant_id_field" type="hidden" name="variant_id" value="{{ variants.0.id }}">
+                    <button class="btn-cart">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                        </svg>
+                        Add to Cart
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- Right Side - Product Info -->
+        <div class="product-info">
+            <h1 class="product-title">{{ product.name }}</h1>
+            <p class="product-brand">{{ product.brand }}</p>
+
+            <div class="price-section">
+                <div class="price-special-label">{% if offer %}Special price{% else %}Price{% endif %}</div>
+                <div class="price-container">
+                    {% if offer %}
+                    <!-- Main price -->
+                    <div class="price-current">₹{{ offer.price }}</div>
+
+                    <!-- Secondary price info -->
+                    <div class="price-sub">
+                        <span class="price-old">₹{{ product.price }}</span>
+
+                        <span class="offer-badge">
+                            {{ offer.percentage }}% OFF
+                        </span>
+
+                        {% if offer.category_offer %}
+                        <span class="offer-meta">
+                            on {{ product.style.name|lower }} tees
+                        </span>
+                        {% endif %}
+
+                        <span class="price-info-icon" title="Offer applied automatically at checkout">
+                            ⓘ
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="price-current">₹{{ product.price }}</div>
+                    {% endif %}
+                </div>
+                <div class="stock-info">
+                    <span class="stock-label">Availability:</span>
+                    <div class="stock-status">
+                        {% if product.total_stock > 10 %}
+                        <span class="stock-indicator in-stock"></span>
+                        <span class="stock-text in-stock">In Stock</span>
+                        {% elif product.total_stock > 0 %}
+                        <span class="stock-indicator low-stock"></span>
+                        <span class="stock-text low-stock">Limited Stocks Only</span>
+                        {% elif product.total_stock == 0 %}
+                        <span class="stock-indicator out-of-stock"></span>
+                        <span class="stock-text out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <p class="product-description">
+                {{ product.description }}
+            </p>
+
+            <div class="size-section">
+                <h2 class="section-heading">Select Size</h2>
+
+                <div class="size-options" id="sizeOptions">
+                    {% for variant in variants %}
+                    <button class="size-btn {% if forloop.first %}active{% endif %}" value="{{ variant.id }}"
+                        onclick="selectSize(this, '{{ variant.id }}')">{{ variant.size }}</button>
+                    {% endfor %}
+                </div>
+
+                <div class="quantity-section">
+                    <div class="quantity-control">
+                        <span class="quantity-label">Quantity:</span>
+                        <div class="quantity-input-group">
+                            <button class="quantity-btn-minus" onclick="decreaseQuantity()">−</button>
+                            <input type="number" class="quantity-input" id="quantityInput" value="1" min="1" max="10"
+                                readonly>
+                            <button class="quantity-btn-plus" onclick="increaseQuantity()">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons-mobile">
+
+                    <form action="{% url 'add-to-wishlist' %}" method="post" class="cart-form" id="addToWishlist">
+                        {% csrf_token %}
+                        <input name="product_uuid" type="hidden" value="{{ product.uuid }}">
+                        <button type="submit" class="btn-wishlist">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            Add to Wishlist
+                        </button>
+                    </form>
+
+                    <form action="{% url 'add-to-cart' %}" method="post" class="cart-form" id="addToCartMobile">
+                        {% csrf_token %}
+                        <input name="product_id" type="hidden" value="{{ product.id }}">
+                        <input type="hidden" name="quantity" value="1" id="hiddenQuantityInputMobile">
+                        <input class="variant_id_field" type="hidden" name="variant_id" value="{{ variants.0.id }}">
+                        <button class="btn-cart">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                            </svg>
+                            Add to Cart
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="product-details-section">
+                <h2 class="section-heading">Product Details</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Category:</span>
+                    <span class="detail-value">{{ product.category }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Style:</span>
+                    <span class="detail-value">{{ product.style.name }}</span>
+                </div>
+                {% if product.material %}
+                <div class="detail-item">
+                    <span class="detail-label">Material:</span>
+                    <span class="detail-value">{{ product.material }}</span>
+                </div>
+                {% endif %}
+                {% if product.fit %}
+                <div class="detail-item">
+                    <span class="detail-label">Fit:</span>
+                    <span class="detail-value">{{ product.fit }}</span>
+                </div>
+                {% endif %}
+                {% if product.care_instructions %}
+                <div class="detail-item">
+                    <span class="detail-label">Care Instructions:</span>
+                    <span class="detail-value">{{ product.care_instructions }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="image-modal" id="imageModal" onclick="closeImageModalOnBackdrop(event)">
+    <div class="modal-content">
+        <button id="modalPrevious" class="modal-nav prev" onclick="changeModalImage(-1)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <div class="modal-image" id="modalImage">
+
+            {% if product.image_url != ' ' %}
+            <img id="modalImageContent" src="{{product.image_url}}" alt="">
+            {% else %}
+            <div id="modalImageContent" style="background-image: url({{product.image_url}});"></div>
+            {% endif %}
+
+            <button class="modal-close" onclick="event.stopPropagation(); closeImageModal();">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </button>
+        </div>
+        <button id="modalNext" class="modal-nav next" onclick="changeModalImage(1)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="reviews-section">
+    <h2 class="section-heading">Customer Reviews</h2>
+    <div class="reviews-header">
+        <div class="overall-rating">
+            <div class="rating-number">{{ rating_summary.average }}</div>
+            <div class="rating-stars">
+                <!-- ★★★★☆ -->
+                {% for _ in "12345" %}
+                    {% if forloop.counter <= rating_summary.average %}★{% else %}☆{% endif %} 
+                {% endfor %}
+            </div>
+            <div class="rating-count">{{ rating_summary.total_reviews }} reviews</div>
+        </div>
+        <div class="rating-breakdown">
+            {% for key, value in rating_summary.breakdown.items %}
+            <div class="breakdown-item">
+                <span class="breakdown-label">{{ key }} ★</span>
+                <div class="breakdown-bar">
+                    <div class="breakdown-fill" style="width: {{ value }}%;"></div>
+                </div>
+                <span class="breakdown-percent">{{ value }}%</span>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="review-list">
+
+        {% for review in reviews %}
+        <div class="review-item">
+            <div class="review-header">
+                {% if review.user.profile_img_url %}
+                <img src="{{ review.user.profile_img_url }}" alt="" class="review-avatar">
+                {% else %}
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#B55E8A" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                {% endif %}
+                <div class="review-info">
+                    <div class="review-name">{{ review.user.full_name }}</div>
+                    <div class="review-date">{{ review.created_at|timesince }} ago</div>
+                </div>
+                <div class="review-stars">
+                    {% for _ in "12345" %}
+                    {% if forloop.counter <= review.rating %} ★ {% else %} ☆ {% endif %} {% endfor %} </div>
+
+                </div>
+                <p class="review-text">
+                    {{ review.review }}
+                </p>
+            </div>
+            {% empty %}
+            <!-- Empty state -->
+            <div class="no-reviews">
+                <div class="no-reviews-icon">⭐</div>
+
+                <h3>No reviews yet</h3>
+                <p>
+                    Be the first to share your thoughts about this product.
+                    Your review helps other customers make better choices.
+                </p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+        <h2 class="related-title">Related Products</h2>
+        <div class="related-grid">
+
+            {% for product in related_products %}
+            <a style="text-decoration: none;" href="{% url 'product-details' product.uuid %}">
+                <div class="related-card">
+                    {% if product.offer_price and product.offer_price != product.price %}
+                            <span class="discount-badge subtle">
+                                -{{ product.offer_percentage }}%
+                            </span>
+                    {% endif %}
+                    {% if product.image_url != ' ' %}
+                    <img class="related-image" src="{{ product.image_url }}" alt="">
+                    {% else %}
+                    <div class="related-image" style="background: linear-gradient(135deg, #ffe5d9, #ffd4c4);"></div>
+                    {% endif %}
+                    <div class="related-product-info">
+                        <div class="related-product-name">Graphic Print Tee</div>
+                        <div class="product-price">
+                            <div class="price-stack">
+                                {% if product.offer_price and product.offer_price != product.price %}
+                                <span class="price-current">₹{{ product.offer_price }}</span>
+                                <span class="price-old">₹{{ product.price }}</span>
+                                {% else %}
+                                <span class="price-current">₹{{ product.price }}</span>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+    {% endblock %}
+
+    {% block scripts %}
+    <script src="{% static 'product/user/js/product_details.js' %}"></script>
+    {% endblock %}

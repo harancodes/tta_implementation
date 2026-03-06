@@ -1,0 +1,272 @@
+
+    /* ============================================
+       GLOBAL STYLES
+       ============================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f7f7f7 0%, #f0f0f0 100%);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* ============================================
+       OTP CARD
+       ============================================ */
+    .otp-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .otp-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #B55E8A;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       FORM STYLES
+       ============================================ */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      display: block;
+      transition: all 0.3s ease;
+      background-color: #fafafa;
+      color: #333;
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus {
+      outline: none;
+      border-color: #B55E8A;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(181, 94, 138, 0.1);
+    }
+
+    input[type="text"]::placeholder,
+    input[type="tel"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="email"]::placeholder {
+      color: #999;
+    }
+
+    .verify-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #B55E8A 0%, #a5537e 100%);
+      border: none;
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(181, 94, 138, 0.3);
+    }
+
+    .verify-btn:hover {
+      background: linear-gradient(135deg, #a5537e 0%, #954d6f 100%);
+      box-shadow: 0 6px 16px rgba(181, 94, 138, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .verify-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(181, 94, 138, 0.3);
+    }
+
+    /* ============================================
+       RESEND SECTION
+       ============================================ */
+    .resend-section {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    #resend-timer {
+      color: #666;
+      font-weight: 500;
+    }
+
+    #timer-display {
+      color: #B55E8A;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+    }
+
+    .resend-section a {
+      color: #B55E8A;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .resend-section a:hover {
+      text-decoration: underline;
+      background-color: rgba(181, 94, 138, 0.1);
+    }
+
+    /* ============================================
+       BACK LINK
+       ============================================ */
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .back-link a {
+      color: #666;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .back-link a:hover {
+      color: #B55E8A;
+      text-decoration: underline;
+      background-color: rgba(181, 94, 138, 0.05);
+    }
+
+    /* ============================================
+       ERROR STYLES
+       ============================================ */
+    .error-box {
+      background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%);
+      color: #b30000;
+      border: 2px solid #ff9999;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    label.error {
+      color: #d32f2f;
+      font-weight: 500;
+      font-size: 13px;
+      margin-top: 6px;
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+       ============================================ */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      .otp-card {
+        padding: 24px;
+        border-radius: 12px;
+      }
+
+      .title {
+        font-size: 22px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      input[type="text"],
+      input[type="tel"],
+      input[type="password"],
+      input[type="email"] {
+        padding: 12px 14px;
+        font-size: 15px;
+      }
+
+      .verify-btn {
+        padding: 12px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .otp-card {
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 20px;
+      }
+    }

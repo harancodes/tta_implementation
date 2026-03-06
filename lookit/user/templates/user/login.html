@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Lookit</title>
+  <link rel="stylesheet" href="{% static 'user/css/login.css' %}">
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Login to Lookit</h2>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="error-box">
+      {{message}}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" id="login_form">
+      {% csrf_token %}
+      <div class="form-group">
+        <input type="email" name="email" placeholder="Email" required>
+      </div>
+      <div class="form-group">
+        <!-- <input type="password" name="password" placeholder="Password" required> -->
+        <div class="password-wrapper">
+          <input type="password" name="password" id="password" placeholder="Password" required>
+          <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+            <!-- Eye icon (shown when password is hidden) -->
+            <svg id="eyeIcon" viewBox="0 0 24 24" style="display: block;">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <!-- Eye off icon (shown when password is visible) -->
+            <svg id="eyeOffIcon" viewBox="0 0 24 24" style="display: none;">
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+              </path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="links">
+        <a href="{% url 'password-reset' %}">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <div class="or-separator">OR</div>
+    <a href="{% url 'social:begin' 'google-oauth2' %}">
+      <button class="btn-google">
+        <!-- Google SVG Icon -->
+        <svg viewBox="0 0 533.5 544.3">
+          <path fill="#4285F4"
+            d="M533.5 278.4c0-17.2-1.5-34.1-4.4-50.5H272v95.5h147.5c-6.4 34.6-25.8 64.1-54.7 83.8v69.6h88.3c51.6-47.5 81.4-117.6 81.4-198.4z" />
+          <path fill="#34A853"
+            d="M272 544.3c73.7 0 135.6-24.4 180.8-66.1l-88.3-69.6c-24.5 16.4-55.7 26-92.5 26-71 0-131-47.9-152.5-112.2H28.8v70.4C74.3 477.8 168.5 544.3 272 544.3z" />
+          <path fill="#FBBC05"
+            d="M119.5 321.4c-5.7-16.5-8.9-34.1-8.9-52.4s3.2-35.9 8.9-52.4v-70.4H28.8c-19.3 38.5-30.5 81.7-30.5 125.2s11.2 86.7 30.5 125.2l90.7-70.4z" />
+          <path fill="#EA4335"
+            d="M272 107.3c39.9 0 75.6 13.7 103.9 40.7l77.9-77.9C404.9 24.6 343 0 272 0 168.5 0 74.3 66.5 28.8 172.2l90.7 70.4C141 155.2 201 107.3 272 107.3z" />
+        </svg>
+        Continue with Google
+      </button>
+    </a>
+
+    <div class="signup">
+      Don't have an account? <a href="{% url 'user-signup' %}">Sign Up</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+  <script src="{% static 'user/js/login.js' %}" ></script>
+</body>
+
+</html>

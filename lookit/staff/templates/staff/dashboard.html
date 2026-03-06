@@ -1,0 +1,230 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'staff/css/dashboard.css' %}" />
+  <link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+  <main class="main-content">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+
+      <form id="filter-form" method="GET" action="">
+        <select class="time-filter" name="time_range" onchange="document.getElementById('filter-form').submit();">
+          <option value="week" {% if request.GET.time_range == 'week' %}selected{% endif %}>Last 7 Days</option>
+          <option value="month" {% if request.GET.time_range == 'month' %}selected{% endif %}>This Month</option>
+          <option value="year" {% if request.GET.time_range == 'year' %}selected{% endif %}>This Year</option>
+          <option value="last_5_years" {% if request.GET.time_range == 'last_5_years' %}selected{% endif %}>Last 5 Years</option>
+        </select>
+      </form>
+
+    </div>
+    <div style="
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      background: #f9f9f9;
+      margin-bottom: 15px;
+    ">
+      <span style="color: #666;">Period:</span>
+      <strong>{{ start_date }}</strong>
+      <span style="color: #999;">→</span>
+      <strong>{{ end_date }}</strong>
+    </div>
+
+
+
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <h3>Total Sales</h3>
+        <div class="value">₹{{ dashboard_summary.total_sales  }}</div>
+        {% comment %} <div class="change positive">+12%</div> {% endcomment %}
+      </div>
+      <div class="kpi-card">
+        <h3>Total Orders</h3>
+        <div class="value">{{ dashboard_summary.total_orders  }}</div>
+        <!-- <div class="change positive">+8%</div> -->
+      </div>
+      <div class="kpi-card hidden-mobile">
+        <h3>Active Offers</h3>
+        <div class="value">{{ dashboard_summary.active_offers }} active</div>
+        {% comment %} <div class="change neutral">—</div> {% endcomment %}
+      </div>
+      <div class="kpi-card">
+        <h3>New Users</h3>
+        <div class="value">{{ dashboard_summary.users_count }}</div>
+        {% comment %} <div class="change positive">+5%</div> {% endcomment %}
+      </div>
+    </div>
+
+    <!-- Second Row - Vertical Stack -->
+    <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;">
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Quick Actions</div>
+        </div>
+        <div class="quick-actions">
+          <a href="{% url 'admin-add-product' %}"><button class="btn btn-primary">Add New Product</button></a>
+          <a href="{% url 'admin-add-offer' %}"><button class="btn btn-secondary">Create Offer</button></a>
+          <a href="{% url 'admin-add-coupon' %}"><button class="btn btn-secondary">Create Coupon</button></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Sales Performance Chart -->
+      <div class="chart-scroll full-width">
+        <div class="card overview-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Sales Performance</div>
+              <div class="card-subtitle">This {{request.GET.time_range|default:'week'  }}</div>
+            </div>
+            <div class="value" style="font-size: 1.5rem;">₹{{ dashboard_summary.total_sales  }}</div>
+          </div>
+
+          {% if dashboard_summary.total_sales != 0 %}
+          <div class="chart-wrapper">
+            <canvas id="salesChart"></canvas>
+          </div>
+          {% else %}
+            <!-- Empty State Overlay -->
+          <div id="chart-empty-state" class="chart-empty-state">
+            <div class="empty-title">No sales data</div>
+            <div class="empty-subtitle">
+              There were no sales recorded in this period
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Top Selling Brand -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Top Selling Brands</div>
+            <div class="card-subtitle">This {{request.GET.time_range|default:'week'  }} (sales count)</div>
+          </div>
+          <!-- <div class="value" style="font-size: 1.5rem;">25%</div> -->
+        </div>
+        <div class="category-bars">
+          {% for brand in top_selling_brands %}
+            <div class="category-item">
+              <div class="category-label">{{ brand.brand }}</div>
+              <div class="category-bar-container" data-sold="{{ brand.sale_count }} sold">
+                <div class="category-bar" style="width: {{ brand.sale_percentage }}%;"></div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="empty-state">
+              No sales data for this period
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Top Selling Categories -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Top Selling Categories</div>
+            <div class="card-subtitle">This {{request.GET.time_range|default:'week'  }} (sales count)</div>
+          </div>
+          <!-- <div class="value" style="font-size: 1.5rem;">25%</div> -->
+        </div>
+        <div class="category-bars">
+          {% for style in top_selling_styles %}
+            <div class="category-item">
+              <div class="category-label">{{ style.name }}</div>
+              <div class="category-bar-container" data-sold="{{ style.sale_count }} sold">
+                <div class="category-bar" style="width:{{ style.sale_percentage }}%;"></div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="empty-state">
+              No sales data for this period
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="card" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title">Top Selling Products</div>
+      </div>
+
+      <div class="table-container">
+        <table class="top-products-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Total Units Sold</th>
+              <th>Gross revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in top_selling_products %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="product-info">
+                  <img src="{{ product.image_url }}" alt="T-shirt" class="product-thumb" />
+                  <div class="product-details">
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="product-id">#{{ product.uuid }}</div>
+                  </div>
+                </td>
+                <td>{{ product.units_sold }}</td>
+                <td>
+                  <span class="revenue-value">₹{{ product.total_revenue }}</span>
+                </td>
+              </tr>
+            {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' with  message='No sales in this period' %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {{ sales_performance_labels|json_script:"labels-data" }}
+    {{ sales_performance_values|json_script:"values-data" }}
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // Sample data for demo (positive values only)
+    //const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const labels = JSON.parse(
+        document.getElementById('labels-data').textContent
+    );
+    const dataValues = JSON.parse(
+        document.getElementById('values-data').textContent
+    );
+    let upper_limit
+    let step
+    {% if request.GET.time_range == 'last_5_years' %}
+      upper_limit = 150000
+      step = 25000
+    {% else %}
+      upper_limit = 50000
+      step = 10000
+    {% endif %}
+  </script>
+
+  <script src="{% static 'staff/js/dashboard.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'user/css/profile_container.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/account/wishlist.css' %}">
+<!--CSS for profile sidebar-->
+<link rel="stylesheet" href="{% static 'user/css/components/profile_sidebar.css' %}">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+
+
+{% block content %}
+
+<!-- Main Content -->
+<div class="profile-container">
+
+    <!-- Sidebar -->
+    {% include 'user_base/components/profile_sidebar.html' %}
+
+    <!-- Wishlist Content -->
+    <main class="wishlist-content">
+        <div class="page-header">
+            <h1 class="page-title">My Wishlist <span class="wishlist-count">({{ wishlist_products|length }} items)</span></h1>
+            <div class="wishlist-actions">
+                <a href="{% url 'explore' %}">
+                <button class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </button>
+                </a>
+                <form action="{% url 'clear-wishlist' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" id="clearWishlistBtn" class="btn btn-danger">
+                        <i class="far fa-trash-alt"></i> Clear Wishlist
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="wishlist-grid">
+            {% for product in wishlist_products %}
+            <!-- Wishlist Item 1 -->
+            <div class="wishlist-card">
+                <div class="card-image">
+                    <img src="{{ product.image_url }}" alt="Wireless Headphones">
+                    <!-- <span class="card-badge in-stock">In Stock</span> -->
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                    </div>
+                    <div class="card-price">
+                        {% if product.offer_price != product.price %}
+                        <span class="old-price">₹{{ product.price }}</span>
+                         ₹{{ product.offer_price }}
+                        {% else %}
+                            ₹{{ product.price }}
+                        {% endif %}
+                    </div>
+                    <div class="size-selection">
+                        <label for="sizeOptions">Size:</label>
+                        <select id="sizeOptions" class="size-dropdown">
+                            <option selected disabled>Select Size</option>
+                            {% for variant in product.variant.all %}
+                            {% if variant.stock != 0  %}
+                            <option value="{{ variant.id }}">{{ variant.size }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="card-actions">
+
+
+                        <form action="{% url 'move-to-cart' %}" method="post" id="moveToCartForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="btn btn-primary" disabled>
+                                <i class="fas fa-shopping-cart"></i> Move to Cart
+                                <span class="tooltip">Please select a size</span>
+                            </button>
+                        </form>
+
+                        <form action="{% url 'remove-from-wishlist' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="remove-btn" title="Remove from wishlist">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="wishlist-empty-wrap">
+                <div class="wishlist-empty-illustration">
+                    <i class="fas fa-heart-broken"></i>
+                </div>
+
+                <div class="wishlist-empty-content">
+                    <h2>No favorites yet</h2>
+                    <p>
+                        You haven’t added anything to your wishlist.
+                        Browse products and tap the heart to save them here.
+                    </p>
+
+                    <a href="{% url 'explore' %}" class="wishlist-empty-cta">
+                        <i class="fas fa-compass"></i>
+                        Discover Products
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+
+            <!-- Wishlist Item 3 -->
+            <!-- <div class="wishlist-card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Wireless Earbuds">
+                    <span class="card-badge out-of-stock">Out of Stock</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Wireless Earbuds Pro</h3>
+                        <div class="card-sku">SKU: WEB-2023P</div>
+                    </div>
+                    <div class="card-price">
+                        ₹199.99
+                    </div>
+                    <div class="size-selection">
+                        <label for="size-web2023">Size:</label>
+                        <select id="size-web2023" class="size-dropdown" disabled>
+                            <option value="">Select Size</option>
+                            <option value="one-size">One Size</option>
+                            <option value="s">S</option>
+                            <option value="m">M</option>
+                            <option value="l">L</option>
+                        </select>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" disabled>
+                            <i class="fas fa-shopping-cart"></i> Out of Stock
+                        </button>
+                        <button class="remove-btn" title="Remove from wishlist">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div> -->
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'user/js/account/wishlist.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'product/admin/css/list.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Product Management</h1>
+        <div class="header-actions">
+            <a href="{% url 'admin-add-product' %}">
+                <button class="btn btn-add-product">+ Add Product</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'admin-list-products' %}" id="searchForm" class="search-form">
+
+
+            <!--to preserve filter query params-->
+            {% if request.GET.category %}
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+            {% endif %}
+            {% if request.GET.style %}
+            <input type="hidden" name="style" value="{{ request.GET.style }}">
+            {% endif %}
+            {% if request.GET.stock %}
+            <input type="hidden" name="stock" value="{{ request.GET.stock }}">
+            {% endif %}
+            {% if request.GET.price %}
+            <input type="hidden" name="price" value="{{ request.GET.price }}">
+            {% endif %}
+
+
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search products" id="searchInput"
+                        value="{{ request.GET.search }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+                    <!--search field clear button-->
+                    <div class="search-actions">
+                        <a href="{% url 'admin-list-products' %}?category={{ request.GET.category }}&style={{ request.GET.style }}&stock={{ request.GET.stock }}&price={{ request.GET.price }}">
+                            <button type="button" class="clear-btn" id="clearBtn">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </a>
+                    </div>
+
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()">
+                    <span class="filter-icon"></span>
+                    <span>Filters</span>
+                </button>
+            </div>
+        </form>
+        <!-- Filters Form -->
+        <form method="GET" action="" id="filterForm" class="filter-form">
+            {% if request.GET.search %}
+            <input type="hidden" value="{{ request.GET.search }}" name="search">
+            {% endif %}
+            <div class="filters-container {% if request.GET.category or request.GET.style or request.GET.stock or request.GET.price %}show{% endif %}" id="filtersContainer">
+                <div class="filters-row">
+
+                    <div class="filter-group">
+                        <select name="category" id="categorySelect" class="filter-select">
+                            <option value="">Category</option>
+                            <option value="men" {% if request.GET.category == 'men' %}selected{% endif %}>Men</option>
+                            <option value="women" {% if request.GET.category == 'women' %}selected{% endif %}>Women</option>
+                            <option value="kids" {% if request.GET.category == 'kids' %}selected{% endif %}>Kids</option>
+                            <option value="unisex" {% if request.GET.category == 'unisex' %}selected{% endif %}>Unisex</option>
+                        </select>
+                    </div>
+
+                    <!-- Styles Filter -->
+                    <div class="filter-group">
+                        <div class="searchable-dropdown" id="stylesDropdownMobile">
+                            <input type="text" class="searchable-dropdown-input" id="stylesInputMobile"
+                                placeholder="{% if request.GET.style %}{{request.GET.style}}{% else %}All Styles{% endif %}" readonly>
+                            <input type="hidden" id="stylesValueMobile" name="style" value="{{ request.GET.style }}">
+                            <svg class="searchable-dropdown-arrow" viewBox="0 0 12 12"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#333" d="M6 9L1 4h10z" />
+                            </svg>
+                            <div class="searchable-dropdown-options">
+                                <div class="searchable-dropdown-search">
+                                    <input type="text" placeholder="Search styles..." id="stylesSearchMobile">
+                                </div>
+                                <div class="searchable-dropdown-option" data-value="" data-text="All Styles">All Styles
+                                </div>
+                                {% for style in styles %}
+                                <div class="searchable-dropdown-option" data-value="{{ style.name }}" data-text="{{ style.name }}">{{ style.name }}</div>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="stock" id="stockSelect" class="filter-select">
+                            <option value="">Stock Status</option>
+                            <option value="in_stock" {% if request.GET.stock == 'in_stock' %}selected{% endif %}>In Stock</option>
+                            <option value="low_stock"  {% if request.GET.stock == 'low_stock' %}selected{% endif %}>Low Stock</option>
+                            <option value="out_of_stock" {% if request.GET.stock == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="price" id="priceSelect" class="filter-select">
+                            <option value="">Price Range</option>
+                            <option value="0-500" {% if request.GET.price == '0-500' %}selected{% endif %}>₹0 - ₹500</option>
+                            <option value="500-1000" {% if request.GET.price == '500-1000' %}selected{% endif %}>₹500 - ₹1000</option>
+                            <option value="1000-2000" {% if request.GET.price == '1000-2000' %}selected{% endif %}>₹1000 - ₹2000</option>
+                            <option value="2000+" {% if request.GET.price == '2000+' %}selected{% endif %}>₹2000+</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-apply" id="applyFiltersBtn">Apply Filters</button>
+                    <a href="{% url 'admin-list-products' %}">
+                        <button type="button" class="btn btn-reset" id="resetFiltersBtn">Rest Filters</button>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Product Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Total Stock</th>
+                    <th>Status</th>
+                    <th>Manage Stocks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for product in page_obj %}
+                <tr>
+                    <td class="product-id">{{product.uuid}}</td>
+                    <td>
+                        {% if product.image_url != ' ' %}
+                        <img class="product-image" src="{{ product.image_url }}" alt="">
+                        {% else %}
+                        <div class="product-image" style="background: #f3e5ab;">👕</div>
+                        {% endif %}
+                    </td>
+                    <td class="product-name">{{product.name}}</td>
+                    <td class="product-price">₹{{ product.price }}</td>
+                    <td class="product-stock">{{ product.total_stock|default:'0' }}</td>
+                    <td>
+                        {% if product.is_active %}
+                        <span class="status-badge status-active">Active</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">Deleted</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'admin-manage-stocks' product.uuid %}" class="manage-stocks-link">Manage
+                            Stocks</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin-view-product' product.uuid %}">
+                            <button class="btn-view">View</button>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'product/admin/js/list.js' %}"></script>
+{% endblock %}

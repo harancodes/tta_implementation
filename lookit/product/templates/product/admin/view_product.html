@@ -1,0 +1,202 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'product/admin/css/view_product.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-products' %}">Products</a>
+        <span>/</span>
+        <span class="truncate-text">{{ product.name }}</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Product Details</h1>
+        <div class="page-actions">
+            {% if product.is_active %}
+            <a style="text-decoration: none;" href="{% url 'admin-manage-stocks' product.uuid %}">
+                <button class="btn-primary">Manage Stocks</button>
+            </a>
+            <a href="{% url 'admin-edit-product' product.uuid %}">
+                <button class="btn-secondary">Edit</button>
+            </a>
+            <button class="btn-danger" onclick="openDeleteModal()">Delete</button>
+            {% else %}
+            <button class="btn-warning" onclick="openRestoreModal()">Restore</button>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Product Header -->
+    <div class="product-header">
+        <div class="product-info">
+            <div class="product-name-row">
+                <h1 class="product-name">{{ product.name }}</h1>
+                {% if product.is_active %}
+                <span class="status-badge status-active">Active</span>
+                {% else %}
+                <span class="status-badge status-inactive">Deleted</span>
+                {% endif %}
+            </div>
+            <div class="product-brand">{{product.brand}}</div>
+            <p class="product-description">{{ product.description }}</p>
+            <div class="product-categories">
+                <div class="category-badge">
+                    <span class="category-label">Category:</span>
+                    <span class="category-value">{{ product.category }}</span>
+                </div>
+                <div class="category-badge">
+                    <span class="category-label">Style:</span>
+                    <span class="category-value">{{ product.style.name }}</span>
+                </div>
+            </div>
+            <div class="product-meta">
+                <div class="product-meta-item">
+                    <span class="product-meta-label">Product ID:</span>
+                    <span class="product-meta-value">{{ product.uuid }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="product-thumbnail">
+            <img src="{{ product.image_url }}" alt="Product Thumbnail">
+        </div>
+    </div>
+
+    <!-- Mobile Actions (shown only on small devices) -->
+    <div class="mobile-actions">
+        {% if product.is_active %}
+        <a href="{% url 'admin-edit-product' product.uuid %}">
+            <button class="btn-secondary">Edit</button>
+        </a>
+        <button class="btn-danger" onclick="openDeleteModal()">Delete</button>
+        {% else %}
+        <button class="btn-warning" onclick="openRestoreModal()">Restore</button>
+        {% endif %}
+    </div>
+
+    <!-- Details Container -->
+    <div class="details-container">
+        <!-- Pricing & Inventory -->
+        <div class="details-section">
+            <h2 class="section-title">Pricing & Inventory</h2>
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span class="detail-label">Base Price</span>
+                    <span class="detail-value price">₹{{ product.price }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Created Date</span>
+                    <span class="detail-value date">{{ product.created_at.date }}</span>
+                </div>
+                <!-- <div class="detail-item">
+                    <span class="detail-label">Total Variants</span>
+                    <span class="detail-value">{{ product.total_variants }}</span>
+                </div> -->
+                <!-- <div class="detail-item">
+                    <span class="detail-label">Total Stock</span>
+                    <span class="detail-value stock">{{ product.total_stocks }} units</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Total Units Sold</span>
+                    <span class="detail-value sold">0 units</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Total Revenue Generated</span>
+                    <span class="detail-value revenue">₹0</span>
+                </div> -->
+
+            </div>
+        </div>
+
+        <!-- Product Specifications -->
+        <div class="details-section">
+            <h2 class="section-title">Product Specifications</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Material</span>
+                    <span class="detail-value">{{ product.material|default:'Not Provided' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fit</span>
+                    <span class="detail-value">{{ product.fit|default:'Not Provided' }}</span>
+                </div>
+                <div class="detail-item full-width">
+                    <span class="detail-label">Care Instructions</span>
+                    <span class="detail-value">{{ product.care_instructions|default:'Not Provided' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Gallery -->
+        <div class="details-section">
+            <h2 class="section-title">Product Gallery</h2>
+            <div class="image-preview">
+
+                {% for image in product_images %}
+                <div class="image-preview-item">
+                    <img src="{{ image.image_url }}" alt="Product Image 1">
+                </div>
+                {% endfor %}
+                <!-- <div class="image-preview-item">
+                    <img src="https://via.placeholder.com/300x300?text=Image+2" alt="Product Image 2">
+                </div> -->
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Delete Product</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to delete this product?
+                The product will be hidden from users but can be restored later.
+                Variants and related data will remain stored in the system.</p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <form action="{% url 'admin_toggle_product_active' product.uuid %}" method="post">
+                {% csrf_token %}
+                <button class="modal-btn modal-btn-confirm">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Confirmation Modal -->
+<div class="modal-overlay" id="restoreModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Restore Product</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to restore this product?
+                Once restored, it will become visible to users and available for purchase again.</p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeRestoreModal()">Cancel</button>
+            <form action="{% url 'admin_toggle_product_active' product.uuid %}" method="post">
+                {% csrf_token %}
+                <button class="modal-btn modal-btn-warning">Restore</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'product/admin/js/view_product.js' %}"></script>
+{% endblock %}

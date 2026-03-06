@@ -1,0 +1,221 @@
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+  }
+
+  body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+  }
+
+  .login-container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+  }
+
+  h2 {
+      margin-bottom: 25px;
+      color: #333;
+  }
+
+  .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      outline: none;
+  }
+
+  .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #B55E8A;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+  }
+
+  .btn:hover {
+      background-color: #9c4c76;
+  }
+
+  .links {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 14px;
+      margin-bottom: 20px;
+  }
+
+  .links a {
+      color: #B55E8A;
+      text-decoration: none;
+  }
+
+  .links a:hover {
+      text-decoration: underline;
+  }
+
+  .signup {
+      margin-top: 15px;
+  }
+
+  .signup a {
+      color: #B55E8A;
+      text-decoration: none;
+      font-weight: bold;
+  }
+
+  .signup a:hover {
+      text-decoration: underline;
+  }
+
+  .or-separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: #aaa;
+      font-weight: bold;
+  }
+
+  .or-separator::before,
+  .or-separator::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+      margin: 0 10px;
+  }
+
+  .btn-google {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      color: #444;
+      border: 1px solid #ccc;
+      padding: 12px 20px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+  }
+
+  .btn-google:hover {
+      background-color: #f0f0f0;
+  }
+
+  .btn-google svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+  }
+
+  .error-box {
+      background: #ffe6e6;
+      color: #b30000;
+      border: 1px solid #ffcccc;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+  }
+
+
+  /* jQuery validation error styling */
+  label.error {
+      color: #b74747;
+      font-weight: normal;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      margin-left: 1px;
+  }
+
+  @media (max-width: 480px) {
+      .login-container {
+          padding: 30px 20px;
+      }
+  }
+
+
+/*FOR PASSWORD SHOWING AND HIDING EYE ICON*/
+.password-wrapper {
+      position: relative;
+      display: block;
+  }
+
+  .password-wrapper input {
+      padding-right: 45px;
+  }
+
+  .password-wrapper input[type="password"],
+  .password-wrapper input[type="text"] {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      outline: none;
+  }
+
+  .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+      z-index: 20;
+      pointer-events: auto;
+  }
+
+  .password-toggle:hover {
+      color: #333;
+      background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .password-toggle:active {
+      transform: translateY(-50%) scale(0.95);
+  }
+
+  .password-toggle svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+  }

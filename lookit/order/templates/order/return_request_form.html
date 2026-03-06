@@ -1,0 +1,123 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/return_request_form.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/components/address_modal.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- Return Request Form -->
+<div class="return-container">
+
+            <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{% url 'my-orders' %}">My Orders</a></li>
+                <li><a href="{% url 'track-order' order.uuid %}">{{ order.product.name }}</a></li>
+                <li aria-current="page">Return Order</li>
+            </ol>
+        </nav>
+
+    <div class="return-header">
+        <h1>Return Order</h1>
+        <p>You can return your product within 7 days of delivery. Please ensure the product is unused and in its original packaging.</p>
+    </div>
+
+    <div class="return-card">
+        <h2>Order Summary</h2>
+        <div class="order-summary">
+            <div class="product-image">
+                <img src="{{ order.product.image_url }}" alt="Classic Cotton Tee">
+            </div>
+            <div class="product-details">
+                <h3>{{ order.product.name }}</h3>
+                <div class="product-meta">Category: {{ order.product.category }} | Style: {{ order.product.style.name }} | Size: {{ order.variant.size }} </div>
+                <span class="order-id">Order ID: #{{ order.uuid }}</span>
+                <div class="product-price">Total: ₹{{ order.total }}</div>
+            </div>
+        </div>
+
+        <form action="{% url 'return-request-form' order.uuid %}" method="post" enctype="multipart/form-data" id="returnForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="returnReason">Reason for Return *</label>
+                <select name="reason" id="returnReason" class="form-control" required>
+                    <option value="" disabled selected>Select a reason</option>
+                    <option value="wrong-item">Received wrong item</option>
+                    <option value="damaged">Item arrived damaged</option>
+                    <option value="not-as-described">Item not as described</option>
+                    <option value="better-price">Found better price</option>
+                    <option value="no-longer-needed">No longer needed</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Additional Comments</label>
+                <textarea name="comments" id="comments" class="form-control" placeholder="Please provide any additional details about your return..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Add Image(s) of Product (Optional)</label>
+                <div class="file-upload" id="fileUpload">
+                    <i id="uploadIcon" class="fas fa-cloud-upload-alt"></i>
+                    <p id="uploadText">Upload images to show the reason for return</p>
+                    <small>Supports JPG, PNG up to 5MB</small>
+                    <input name="product_images" type="file" id="productImages" style="display: none;" multiple accept="image/*">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Select Pickup Address *</label>
+                <div class="address-cards">
+                    {% for address in address_list %}
+                    <label class="address-card  {% if address.is_default %}selected-address{% endif %}">
+                        <input type="radio" name="pickup_address_id" value="{{ address.id }}" required {% if address.is_default %}checked{% endif %}>
+                        <div class="address-content">
+                            <div class="address-header">
+                                <span class="address-type">{{ address.type }}</span>
+                                {% if address.is_default %}
+                                <span class="default-badge">Default</span>
+                                {% endif %}
+                            </div>
+                            <div class="address-details">
+                                <p>{{ address.full_name }}</p>
+                                <p>{{ address.address_line }}</p>
+                                <p>{{ address.city }}, {{ address.state }}, Pin: {{ address.pincode }}</p>
+                                <p>{{ address.phone }}{% if address.second_phone %}, {{ address.second_phone }}{% endif %}</p>
+                            </div>
+                        </div>
+                    </label>
+                    {% endfor %}
+  
+                    <button onclick='openAddAddressModal()' type="button" class="add-address-btn">
+                        <i class="fas fa-plus"></i> Add New Address
+                    </button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{% url 'track-order' order.uuid %}">
+                <button type="button" class="btn btn-outline">Cancel</button>
+                </a>
+                <button type="submit" class="btn btn-primary">Submit Return Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+ {% include 'user_base/components/add_address_modal.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<!--FOR JQUERY FORM VALIDATION-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+<script src="{% static 'user/js/components/add_address_modal.js' %}"></script>
+<script src="{% static 'order/js/return_request_form.js' %}"></script>
+{% endblock %}

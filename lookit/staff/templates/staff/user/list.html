@@ -1,0 +1,185 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'staff/user/css/list.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">User Management</h1>
+        <!-- <div class="header-actions">
+            <a href="{% url 'admin-add-staff' %}" class="btn btn-add-staff">
+                <span class="btn-add-staff-icon">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </span>
+                <span>Add New Staff</span>
+            </a>
+        </div> -->
+    </div>
+
+    <!-- Search and Filters -->
+
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'admin-user' %}" id="searchForm" class="search-form">
+        <div class="filters-section">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search by Name or Email" id="searchInput"
+                        value="{{ request.GET.search  }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+                    <div class="search-actions">
+                        <a style="text-decoration: none;" href="{% url 'admin-user' %}?search=&role={{ request.GET.role }}&status={{ request.GET.status }}&date={{ request.GET.date }}">
+                        <button type="button" class="clear-btn" id="clearBtn" >
+                            <svg viewBox="0 0 24 24">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                        </a>
+                    </div>
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()">
+                    <span class="filter-icon"></span>
+                    <span>Filters</span>
+                </button>
+            </div>
+            <!-- Filters Form -->
+            <div class="filters-container {% if request.GET.role or request.GET.status or request.GET.date %}show{% endif %}"
+                id="filtersContainer">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <select name="role" id="roleSelect" class="filter-select">
+                            <option value="">Filter by Role</option>
+                            <option value="user" {% if request.GET.role == 'user' %}selected {% endif %}>User</option>
+                            <option value="staff" {% if request.GET.role == 'staff' %}selected {% endif %}>Staff</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select name="status" id="statusSelect" class="filter-select">
+                            <option value="">Status</option>
+                            <option value="active" {% if request.GET.status == 'active' %}selected {% endif %}>Active
+                            </option>
+                            <option value="blocked" {% if request.GET.status == 'blocked' %}selected {% endif %}>Blocked
+                            </option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select name="date" id="dateSelect" class="filter-select">
+                            <option value="">Joined Date</option>
+                            <option value="today" {% if request.GET.date == 'today' %}selected {% endif %}>Today</option>
+                            <option value="week" {% if request.GET.date == 'week' %}selected {% endif %}>This Week
+                            </option>
+                            <option value="month" {% if request.GET.date == 'month' %}selected {% endif %}>This Month
+                            </option>
+                            <option value="year" {% if request.GET.date == 'year' %}selected {% endif %}>This Year
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit"  class="btn btn-apply" id="applyFiltersBtn">Apply
+                        Filters</button>
+                    <a href="{% url 'admin-user' %}">
+                        <button type="button" class="btn btn-reset" id="resetFiltersBtn">Reset Filters</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+    <!-- User Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Profile</th>
+                    <th>Full Name</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Total Orders</th>
+                    <th>Joined Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in page_obj %}
+                <tr>
+                    <td>
+                        {% if user.profile_img_url %}
+                            <img class="profile-picture" src="{{ user.profile_img_url }}" alt="">
+                        {% else %}
+                            <div class="profile-picture">SC</div>
+                        {% endif %}
+                    </td>
+                    <td class="user-name">{{ user.full_name }}</td>
+                    <td>
+                        {% if user.is_staff %}
+                        {% if user.is_superadmin %}
+                        <span class="role-badge admin">Admin</span>
+                        {% else %}
+                        <span class="role-badge staff">Staff</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="role-badge user">User</span>
+                        {% endif %}
+
+                    </td>
+                    <td class="user-email">{{ user.email }}</td>
+                    <td class="user-orders">{{ user.total_orders }}</td>
+                    <td class="user-date">{{ user.created_at.date }}</td>
+                    <td>
+                        {%if user.is_active %}
+                        <span class="status-badge status-active">Active</span>
+                        {% else %}
+                        <span class="status-badge status-blocked">Blocked</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- {% if user.is_staff %}
+                        <a href="{% url 'admin-view-staff' user.id %}"><button class="btn-view">View</button></a>
+                        {% endif %} -->
+                        <a href="{% url 'admin-view-user' user.id %}"><button class="btn-view">View</button></a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+
+    </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'staff/user/js/list.js' %}"></script>
+{% endblock %}

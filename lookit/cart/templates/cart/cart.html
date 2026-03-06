@@ -1,0 +1,278 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<div class="container">
+    <h1 class="page-title">
+        <i class="fas fa-shopping-cart"></i> Shopping Cart
+    </h1>
+
+    <div class="cart-container">
+
+        <!-- Cart Items -->
+        <div class="cart-items">
+            {% if not cart_items %}
+            <!-- Empty Cart State -->
+            <div class="empty-cart">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h2>Your cart is empty</h2>
+                <p>Looks like you haven't added anything to your cart yet. Start shopping to find amazing products!</p>
+            </div>
+            {% endif %}
+
+            {% for item in cart_items %}
+            <div
+                class="cart-item {% if not item.is_product_active %}disabled{% elif not item.stock_available %}out-of-stock{% endif %}">
+                {% if not item.stock_available %}
+                <div class="stock-badge">OUT OF STOCK</div>
+                {% endif %}
+                <img src="{{ item.product.image_url }}" alt="Product" class="item-image">
+                <div class="item-details">
+                    <h3 class="item-title">{{ item.product.name }}</h3>
+                    <div class="item-size">Size: {{ item.variant.size }}</div>
+                    <div class="item-actions">
+                        <div class="quantity-selector">
+                            <button class="quantity-btn"
+                                onclick="updateQuantity(this, '{{ item.id }}', '{{ item.variant.id }}', '{{ csrf_token }}')">-</button>
+                            <span class="quantity">{{ item.quantity }}</span>
+                            <button class="quantity-btn"
+                                onclick="updateQuantity(this, '{{ item.id }}', '{{ item.variant.id }}', '{{ csrf_token }}')">+</button>
+                        </div>
+
+                        <form action="{% url 'remove_cart_item' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="variant_id" value="{{ item.variant.id }}">
+                            <button type="submit" class="remove-btn">
+                                <i class="far fa-trash-alt"></i> Remove
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            <div class="item-price-block">
+                {% if  item.offer_price != item.product.price %}
+                    <div class="price-row">
+                        <span class="original-price">₹{{ item.product.price }}</span>
+                        <span class="discounted-price">₹{{ item.offer_price }}</span>
+                        
+                    </div>
+                    <div class="total-row">
+                        <span id="cartItemQuantity{{ item.id }}" class="qty-text">{{ item.quantity }}× </span>
+                        <span id="subTotalProduct{{ item.id }}">₹{{ item.sub_total }}</span>
+                    </div>
+                    <!-- <span class="discount-badge">Saved {{ item.offer_percentage }}%</span> -->
+                {% else %}
+                    <div class="price-row">
+                        <span class="normal-price">₹{{ item.product.price }}</span>
+                    </div>
+                    <div class="total-row">
+                        <span id="cartItemQuantity{{ item.id }}" class="qty-text">{{ item.quantity }}× </span>
+                        <span id="subTotalProduct{{ item.id }}" class="item-total">₹{{ item.sub_total }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            </div>
+            {% endfor %}
+
+            <!-- Continue Shopping Button -->
+            <!-- <div class="continue-shopping-wrapper">
+                <a href="{% url 'explore' %}" class="continue-shopping-btn">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
+            </div> -->
+
+        </div>
+
+        <!-- Right Sidebar with Summary and Coupons -->
+        <div class="right-sidebar">
+            <div class="cart-summary">
+                <h3 class="summary-title">Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="sub_total">₹{{ cart_summary.sub_total }}</span>
+                </div>
+                {% if cart_summary.offer_discount != 0 %}
+                <div class="summary-row">
+                    <span>Offer Discount</span>
+                    <span id="cartTotalDiscount" class="discount-amount">-₹{{ cart_summary.offer_discount }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Applied Coupon Display -->
+                 {% if applied_coupon %}
+                <!-- Applied Coupon Row -->
+                <div id="appliedCouponRow" class="summary-row">
+                    <span>Coupon Discount</span>
+                    <span class="discount-amount">-₹<span id="appliedCouponDiscount">{{ cart_summary.coupon_discount }}</span></span>
+                </div>
+                {% endif %}
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="sub_total">+₹{{ cart_summary.delivery_fee }}</span>
+                </div>
+
+                {% if applied_coupon %}
+                <div id="appliedCouponBox" class="applied-coupon-box">
+                    <div class="applied-coupon-content">
+                        <div class="applied-coupon-left">
+                            <i class="fas fa-tag"></i>
+                            <div class="coupon-text">
+                                <span class="applied-label">Applied Coupon</span>
+                                <span class="applied-code" id="appliedCouponCodeText">{{ applied_coupon.code }}</span>
+                            </div>
+                        </div>
+                        <div class="applied-coupon-right">
+                            {% if applied_coupon.discount_type == 'FLAT' %}
+                            <span class="discount-amount">-₹<span id="appliedCouponDiscountText">{{ applied_coupon.discount_value }}</span></span>
+                            {% elif applied_coupon.discount_type == 'PERCENTAGE' %}
+                            <span class="discount-amount">-<span id="appliedCouponDiscountText">{{ applied_coupon.discount_value }}</span>%</span>
+                            {% endif %}
+                            
+                            <form action="{% url 'remove-coupon' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" id="removeCouponBtn" class="remove-coupon-btn" title="Remove coupon">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span id="total_amount">₹{{ cart_summary.grand_total }}</span>
+                </div>
+
+                <!-- Toggle Button for Coupon Section -->
+                <button id="toggleCouponBtn" class="toggle-coupon-btn">
+                    <i class="fas fa-tag"></i> Apply Coupon
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </button>
+
+                <!-- Hidden Coupon Section -->
+                <div id="couponSection" class="coupon-section" style="display: none;">
+
+                    <form action="{% url 'save-coupon' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="coupon-input">
+                            <input type="text" name="coupon_code" id="couponCode" placeholder="Enter coupon code">
+                            <button type="submit" id="applyCouponBtn" class="apply-coupon-btn">Add</button>
+                        </div>
+                    </form>
+
+                    <div id="couponMessage" class="coupon-message"></div>
+
+                    <div class="available-coupons">
+                        <h4>Available Coupons</h4>
+                        <p class="coupon-note">
+                            Coupon may become unavailable before the expiry date if its usage limit is reached.
+                        </p>
+
+                        {% for coupon in saved_coupons %}
+                        {% if coupon != applied_coupon %}
+                        <div class="coupon-item" data-code="WELCOME10" data-discount="10">
+                            <div class="coupon-info">
+                                <span class="coupon-code">{{ coupon.code }}</span>
+                                {% if coupon.discount_type == 'FLAT' %}
+                                <span class="coupon-desc">Save <strong>₹{{ coupon.discount_value }}</strong> on your order</span>
+                                {% elif coupon.discount_type == 'PERCENTAGE' %}
+                                <span class="coupon-desc"><strong>{{ coupon.discount_value }}%</strong> off on your purchase</span>
+                                {% endif %}
+                                
+                                <span class="coupon-expiry">Valid till: {{ coupon.end_date|date:'d M Y' }}</span>
+                            </div>
+                            <form action="{% url 'apply-coupon' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{ coupon.code }}" name="coupon_code" id="">
+                                <input type="hidden" name="cart-total" value="{{ cart_summary.grand_total }}">
+                                <button type="submit" class="apply-coupon-btn">Apply</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        {% empty %}
+                        <!--No saved coupons state-->
+                        <div class="no-coupons">
+                            <i class="fas fa-tag"></i>
+                            <p class="no-coupons-title">No saved coupons</p>
+                            <p class="no-coupons-text">
+                                You haven’t saved any coupons yet.
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if expired_coupons %}
+                    <!--EXPIRED COUPONS-->
+                    <div class="expired-coupons">
+                        <h4>Expired Coupons</h4>
+
+                        <div class="coupon-item expired">
+                            <div class="coupon-info">
+                                <span class="coupon-code">OLDDEAL20</span>
+                                <span class="coupon-desc">20% off on select items</span>
+                                <span class="coupon-expiry">Expired on: 01 Aug 2025</span>
+                            </div>
+                            <span class="expired-label">Expired</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <a href="{% url 'checkout' %}">
+                    <button class="checkout-btn" {% if checkout_block %}disabled{% endif %}>Proceed to Checkout</button>
+                </a>
+
+                <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 1rem;">
+                    <i class="fas fa-lock"></i> Secure Checkout
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer">
+
+    <div class="toast error hidden" id="toastError">
+        <div class="toast-icon">✕</div>
+        <div class="toast-content">
+            <div class="toast-title">Failed</div>
+            <div class="toast-message">Stock not available</div>
+        </div>
+        <button class="toast-close" onclick="closeToast(this)">
+            <svg viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    const MAX_CART_QUANTITY = Number({{ max_quantity }});
+
+    //for updating quantity using ajax
+    url = "{% url 'update-quantity' %}"
+
+</script>
+<script src="{% static 'cart/js/cart.js' %}"></script>
+{% endblock %}

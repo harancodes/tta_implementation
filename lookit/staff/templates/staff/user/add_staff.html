@@ -1,0 +1,99 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'staff/user/css/add_staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-user' %}">User Management</a>
+        <span>/</span>
+        <span>Add New Staff</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Add New Staff</h1>
+        <p class="page-subtitle">Manage customer details and account settings.</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+        <!-- Staff Profile Section -->
+        <div class="profile-section">
+            <div class="profile-image-wrapper">
+                <div class="profile-image">👤</div>
+            </div>
+            <div class="profile-info">
+                <div>
+                    <h2 class="profile-section-title">Staff Profile</h2>
+                    <p class="profile-section-desc">Update customer information and account settings.</p>
+                </div>
+                <button class="btn-upload-photo" onclick="uploadPhoto()">Upload Photo</button>
+            </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="form-group">
+            <label class="form-label" for="fullName">Full Name</label>
+            <input type="text" class="form-input" id="fullName" placeholder="Enter full name">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" class="form-input" id="email" placeholder="Enter email address">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" class="form-input" id="password" placeholder="Enter password">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password', this)">
+                    <svg viewBox="0 0 24 24" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg viewBox="0 0 24 24" class="eye-off-icon" style="display: none;">
+                        <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        </path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <div class="password-wrapper">
+                <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm password">
+                <button type="button" class="password-toggle"
+                    onclick="togglePasswordVisibility('confirmPassword', this)">
+                    <svg viewBox="0 0 24 24" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg viewBox="0 0 24 24" class="eye-off-icon" style="display: none;">
+                        <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        </path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancel()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'staff/user/js/add_staff.js' %}"></script>
+{% endblock %}

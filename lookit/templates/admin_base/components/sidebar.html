@@ -1,0 +1,128 @@
+<aside class="sidebar" id="sidebar">
+    <ul class="nav-menu">
+
+        <li><a href="{% url 'admin-dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'admin-dashboard' %}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </span>
+                <span>Dashboard</span>
+            </a></li>
+
+        <li><a href="{% url 'admin-list-products' %}"
+                class="{% if '/product/admin/' in request.path and '/product/admin/category/' not in request.path%}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </span>
+                <span>Products</span>
+            </a></li>
+
+        <li><a href="{% url 'admin-category-management' %}"
+                class="{% if request.resolver_match.url_name == 'admin-category-management' %}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                </span>
+                <span>Categories</span>
+            </a></li>
+
+        <li><a href="{% url 'admin-user' %}"
+                class="{% if '/admin/user/' in  request.path %}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24"> 
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </span>
+                <span>Users</span>
+            </a></li>
+
+        <li><a href="{% url 'admin-list-orders' %}" 
+            class="{% if '/order/admin/' in  request.path and 'order/admin/return-request/' not in  request.path and 'sales-report' not in request.path %}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                </span>
+                <span>Orders</span>
+            </a></li>
+
+        <li><a href="{% url 'admin-list-return-requests' %}"
+            class="{% if 'order/admin/return-request/' in  request.path %}active{% endif %}">
+            <span class="icon">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M12 1v6m0 6v6m9-9h-6M6 12H0m21.364-5.636l-4.243 4.243M6.879 17.121l-4.243 4.243m14.728 0l-4.243-4.243M6.879 6.879L2.636 2.636">
+                    </path>
+                </svg>
+            </span>
+            <span>Order Returns</span>
+        </a></li>
+
+            <li><a href="{% url 'admin-list-coupons' %}"
+                class="{% if 'coupon/admin/' in  request.path %}active{% endif %}">
+            <span class="icon">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                    <path d="M12 8v13"></path>
+                    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
+                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 4.8 0 0 1 12 8a4.8 4.8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5">
+                    </path>
+                </svg>
+            </span>
+            <span>Coupons</span>
+        </a></li>
+
+            <li><a href="{% url 'admin-list-offers' %}"
+                class="{% if 'offer/admin/' in  request.path %}active{% endif %}">
+            <span class="icon">
+                <svg viewBox="0 0 24 24">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
+                </svg>
+            </span>
+            <span>Offers</span>
+        </a></li>
+
+        <li><a href="{% url 'admin-sales-report' %}"
+            class="{% if 'admin/sales-report/' in  request.path %}active{% endif %}">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </span>
+                <span>Analytics</span>
+            </a></li>
+
+
+
+        <!-- <li><a href="#">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </span>
+                <span>Banner</span>
+            </a></li> -->
+
+
+
+    </ul>
+</aside>

@@ -1,0 +1,673 @@
+/* Container */
+.container {
+    margin: 2rem auto;
+    padding: 0 10%;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.breadcrumbs a {
+    color: #9a4d72;
+    text-decoration: none;
+}
+
+.breadcrumbs .active {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Payment Layout */
+.payment-layout {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.payment-methods {
+    flex: 2;
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.payment-methods h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.payment-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 1.5rem;
+}
+
+.tab {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab.active {
+    color: #9a4d72;
+    border-bottom: 2px solid #9a4d72;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.card-form {
+    max-width: 500px;
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #9a4d72;
+    box-shadow: 0 0 0 3px rgba(154, 77, 114, 0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.cod-message {
+    background-color: #f8f9fa;
+    border-left: 4px solid #9a4d72;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-radius: 0 4px 4px 0;
+    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.order-summary {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    height: fit-content;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.order-summary h3 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.summary-row.total {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.delivery-info {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.delivery-info h4 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1rem;
+}
+
+.delivery-address {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.delivery-address p {
+    margin-bottom: 0.5rem;
+}
+
+.change-link {
+    color: #9a4d72;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.delivery-date {
+    color: #28a745;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-pay {
+    width: 100%;
+    padding: 1rem;
+    background-color: #9a4d72;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1.5rem;
+}
+
+.btn-pay:hover {
+    background-color: #883c62;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .payment-layout {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-right {
+        margin-left: auto;
+    }
+
+    .payment-methods,
+    .order-summary {
+        padding: 1.5rem;
+    }
+
+    .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .tab {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* ==============================
+   ONLINE PAYMENT ENHANCEMENTS
+============================== */
+
+.online-banner {
+    background: linear-gradient(135deg, rgba(154, 77, 114, 0.08), rgba(154, 77, 114, 0.02));
+    border: 1px solid rgba(154, 77, 114, 0.2);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.secure-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(154, 77, 114, 0.1);
+    color: #9a4d72;
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.online-desc {
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* Supported Payment Methods */
+.payment-supported {
+    margin-bottom: 1.5rem;
+}
+
+.payment-supported h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+.payment-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.payment-icons span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Trust Points */
+.payment-trust-points {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.75rem;
+}
+
+.payment-trust-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.payment-trust-points i {
+    color: #28a745;
+}
+
+/* Enhanced Pay Button */
+.online-pay-btn {
+    background: linear-gradient(135deg, #9a4d72, #7a3654);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    letter-spacing: 0.4px;
+}
+
+.online-pay-btn:hover {
+    background: linear-gradient(135deg, #883c62, #652947);
+}
+
+@media (min-width: 1024px) {
+    .online-pay-btn {
+        margin-top: 5rem;
+    }
+}
+
+/* ==============================
+   WALLET PAYMENT UI
+============================== */
+
+.wallet-banner {
+    background: linear-gradient(135deg, rgba(154, 77, 114, 0.08), rgba(154, 77, 114, 0.02));
+    border: 1px solid rgba(154, 77, 114, 0.2);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.wallet-secure-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(154, 77, 114, 0.1);
+    color: #9a4d72;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.wallet-desc {
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* Wallet Balance Card */
+.wallet-balance-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    padding: 1.25rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.wallet-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.wallet-amount {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.wallet-balance-right i {
+    font-size: 2.2rem;
+    color: #9a4d72;
+}
+
+/* Wallet Payment Breakdown */
+.wallet-breakdown {
+    background: #ffffff;
+    border: 1px dashed #ddd;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.wallet-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+}
+
+.wallet-row.total {
+    font-weight: 600;
+    color: #333;
+    border-top: 1px solid #eee;
+    padding-top: 0.7rem;
+}
+
+/* Trust Points */
+.wallet-trust-points {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.wallet-trust-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.wallet-trust-points li i {
+    color: #28a745;
+}
+
+/* Wallet Warning */
+.wallet-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.9rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ffeeba;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/* Wallet Pay Button */
+.wallet-pay-btn {
+    background: linear-gradient(135deg, #9a4d72, #7a3654);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    letter-spacing: 0.4px;
+}
+
+.wallet-pay-btn:hover {
+    background: linear-gradient(135deg, #883c62, #652947);
+}
+
+.wallet-pay-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* ==============================
+   WALLET CONFIRM MODAL (UPGRADED)
+============================== */
+
+.wallet-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    z-index: 9999;
+}
+
+.wallet-confirm-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Bigger Modal Box */
+.wallet-confirm-box {
+    background: white;
+    border-radius: 18px;
+    width: 92%;
+    max-width: 520px;
+    padding: 2.6rem 2.4rem;
+    text-align: center;
+    transform: scale(0.92);
+    opacity: 0;
+    transition: 0.25s ease;
+}
+
+.wallet-confirm-overlay.active .wallet-confirm-box {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Title */
+.wallet-confirm-box h3 {
+    margin-bottom: 1.2rem;
+    color: #333;
+    font-size: 1.6rem;
+}
+
+/* Description */
+.wallet-confirm-text {
+    font-size: 1.05rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Amount Highlight */
+.wallet-confirm-text strong {
+    color: #9a4d72;
+    font-size: 1.2rem;
+}
+
+/* Action Buttons */
+.wallet-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Always equal width */
+    gap: 1.2rem;
+}
+
+.wallet-cancel-btn,
+.wallet-confirm-btn {
+    width: 100%;
+}
+
+
+.wallet-cancel-btn {
+    flex: 1;
+    padding: 0.95rem;
+    border-radius: 8px;
+    background: #f3f3f3;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.wallet-cancel-btn:hover {
+    background: #e5e5e5;
+}
+
+.wallet-confirm-btn {
+    flex: 1;
+    padding: 0.95rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #9a4d72, #7a3654);
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.wallet-confirm-btn:hover {
+    background: linear-gradient(135deg, #883c62, #652947);
+}
+
+.discount-price {
+    color: #28a745;
+}
+
+
+/* ==============================
+   CASH ON DELIVERY STYLING
+============================== */
+
+.cod-banner {
+    background: linear-gradient(135deg, rgba(154, 77, 114, 0.08), rgba(154, 77, 114, 0.02));
+    border: 1px solid rgba(154, 77, 114, 0.2);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.cod-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(154, 77, 114, 0.1);
+    color: #9a4d72;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.cod-desc {
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* COD Details */
+.cod-message ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.cod-message li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.6rem;
+}
+
+.cod-message i {
+    color: #28a745;
+}
+
+/* COD Warning */
+.cod-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ffeeba;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cod-warning i {
+    color: #d39e00;
+}
+
+.cod-pay-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

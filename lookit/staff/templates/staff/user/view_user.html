@@ -1,0 +1,307 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'staff/user/css/view_user.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-user' %}">User Management</a>
+        <span>/</span>
+        <span>{{ user.full_name }}</span>
+    </div>
+
+    <!-- User Header -->
+    <div class="user-header">
+        <div class="user-info">
+            <h1 class="user-name">{{ user.full_name }}</h1>
+            <div class="user-meta">
+                <div class="user-meta-item">
+                    <span>User ID:</span>
+                    <span>USR-{{ user.id|stringformat:"04d" }}
+</span>
+                </div>
+            </div>
+            <div class="badges-container">
+                {% if user.is_active %}
+                <span class="status-badge active">Active</span>
+                {% else %}
+                <span class="status-badge blocked">Blocked</span>
+                {% endif %}
+                <span class="role-badge">User</span>
+            </div>
+        </div>
+        {% if user.profile_img_url %}
+        <img src="{{ user.profile_img_url }}" class="user-avatar-large" alt="">
+        {% else %}
+        <div class="user-avatar-large">👤</div>
+        {% endif %}
+    </div>
+
+    <!-- Contact Information -->
+    <div class="section-card">
+        <h2 class="section-title">Contact Information</h2>
+        <div class="contact-grid">
+            <div class="contact-item">
+                <span class="contact-label">Email</span>
+                <span class="contact-value">{{ user.email }}</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Phone</span>
+                <span class="contact-value">{{ user.phone | default:'not provided' }}</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Gender</span>
+                <span class="contact-value">{{ user.gender | default:'not provided' }}</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Date of Birth</span>
+                <span class="contact-value">{{ user.dob | default:'not provided' }}</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Default Address</span>
+                {% if default_address %}
+                <span class="contact-value">{{ default_address.address_line }}, {{ default_address.city }}, {{ default_address.state }}</span>
+                {% else %}
+                <span class="contact-value">No address created</span>
+                {% endif %}
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Joined Date</span>
+                <span class="contact-value">{{ user.created_at.date }}</span>
+            </div>
+        </div>
+        <div class="section-actions">
+            {% if user.is_active %}
+            <!-- <a href="{% url 'admin-edit-user' user.id %}">
+                <button class="btn btn-edit">Edit Info</button>
+            </a> -->
+            <button class="btn btn-block" onclick="blockUser()">Block User</button>
+
+            {% else %}
+            <button class="btn btn-unblock" onclick="blockUser()">Unblock User</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Referral Information -->
+    <!-- <div class="section-card">
+        <h2 class="section-title">Referral Information</h2>
+        <div class="contact-grid">
+            <div class="contact-item">
+                <span class="contact-label">Referral Code</span>
+                <span class="contact-value">{{ user.referral_code | upper }}</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Referral Reward</span>
+                <span class="contact-value">$25.00</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Total Referrals</span>
+                <span class="contact-value">8</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Referrals Earned</span>
+                <span class="contact-value">$50.00</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Referred By</span>
+                <span class="contact-value">john_doe456</span>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Recent Orders -->
+    <!-- <div class="section-card">
+        <h2 class="section-title">Recent Orders</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="order-id">#12345</td>
+                        <td>May 15, 2024</td>
+                        <td><span class="status-badge status-shipped">Shipped</span></td>
+                        <td>$150</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">#12344</td>
+                        <td>May 10, 2024</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>$200</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">#12343</td>
+                        <td>May 5, 2024</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>$100</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">#12342</td>
+                        <td>April 20, 2024</td>
+                        <td><span class="status-badge status-cancelled">Cancelled</span></td>
+                        <td>$50</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">#12341</td>
+                        <td>April 15, 2024</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>$250</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-footer">
+            <button class="btn-view-all" onclick="viewAllOrders()">View All</button>
+        </div>
+    </div> -->
+
+    <!-- User Wallet -->
+    <!-- <div class="section-card">
+        <h2 class="section-title">User Wallet</h2>
+        <div class="wallet-content">
+            <div class="wallet-balance">
+                <div class="balance-header">
+                    <span class="balance-icon">💳</span>
+                    <span class="balance-label">Current Balance</span>
+                </div>
+                <div class="balance-amount">$50.00</div>
+            </div>
+            <div class="wallet-actions">
+                <div class="wallet-form-title">
+                    <span>💵</span>
+                    <span>Manage Wallet</span>
+                </div>
+                <div class="wallet-form-group">
+                    <label class="wallet-form-label" for="walletAmount">Enter Amount</label>
+                    <div class="wallet-input-wrapper">
+                        <input type="number" class="wallet-input" id="walletAmount" placeholder="0.00" min="0"
+                            step="0.01">
+                    </div>
+                </div>
+                <div class="wallet-buttons">
+                    <button class="btn btn-deduct" onclick="deductAmount()">
+                        <span>➖</span>
+                        <span>Deduct</span>
+                    </button>
+                    <button class="btn btn-add" onclick="addAmount()">
+                        <span>➕</span>
+                        <span>Add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Recent Transactions -->
+    <!-- <div class="section-card">
+        <h2 class="section-title">Recent Transactions</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                        <th>Transaction Type</th>
+                        <th>Payment Method</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="order-id">TXN10234</td>
+                        <td>2025-11-12</td>
+                        <td>Order Payment</td>
+                        <td>Wallet</td>
+                        <td>₹450.00</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">TXN10221</td>
+                        <td>2025-11-10</td>
+                        <td>Wallet Top-up</td>
+                        <td>UPI</td>
+                        <td>₹899.00</td>
+                    </tr>
+                    <tr>
+                        <td class="order-id">TXN10175</td>
+                        <td>2025-11-08</td>
+                        <td>Refund</td>
+                        <td>Credit Card</td>
+                        <td>₹300.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-footer">
+            <button class="btn-view-all" onclick="viewAllTransactions()">View All</button>
+        </div>
+    </div> -->
+
+    <!-- Activity and Account Controls -->
+    <!-- <div class="section-card">
+        <h2 class="section-title">Activity and Other Info</h2>
+        <div class="activity-grid">
+            <div class="activity-item">
+                <span class="activity-label">Last Login</span>
+                <span class="activity-value">May 20, 2024</span>
+            </div>
+            <div class="activity-item">
+                <span class="activity-label">IP Address</span>
+                <span class="activity-value">192.168.11</span>
+            </div>
+            <div class="activity-item">
+                <span class="activity-label">Total Orders</span>
+                <span class="activity-value">15</span>
+            </div>
+            <div class="activity-item">
+                <span class="activity-label">Total Spend</span>
+                <span class="activity-value">$750</span>
+            </div>
+        </div>
+    </div> -->
+</main>
+<!-- Block User Confirmation Modal -->
+<div class="modal-overlay" id="blockModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Block User</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">
+                {% if user.is_active %}
+                Are you sure you want to block this user? They will no longer be able to access
+                their account.
+                {% else %}
+                Are you sure you want to unblock this user?
+                They will regain access to their account and be able to log in again
+                {% endif %}
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeBlockModal()">Cancel</button>
+                <a href="{% url 'admin-block-user-toggle' user.id%}">
+                    {% if user.is_active %}
+                    <button class="modal-btn modal-btn-block">Block User</button>
+                    {% else %}
+                    <button class="modal-btn modal-btn-unblock">Unblock User</button>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'staff/user/js/view_user.js' %}"></script>
+{% endblock %}

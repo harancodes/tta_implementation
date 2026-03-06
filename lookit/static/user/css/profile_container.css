@@ -1,0 +1,9 @@
+.profile-container {
+    margin: 2rem auto;
+    margin-top: 1rem !important;
+    padding: 0 6%;
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    min-height: calc(100vh - 78.6px);
+}

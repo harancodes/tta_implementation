@@ -1,0 +1,301 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/track_return.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+{% endblock %}
+
+{% block content %}
+<!--main content-->
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'my-orders' %}">My Orders</a></li>
+                <li aria-current="page">Track Return</li>
+            </ol>
+        </nav>
+
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                    {% if return_request.status == 'REQUESTED' %}
+                        <span class="order-status requested">
+                            <i class="fas fa-box-open"></i> {{ return_request.status|title }}
+                        </span>
+
+                    {% elif return_request.status == 'APPROVED' %}
+                        <span class="order-status approved">
+                            <i class="fas fa-check-circle"></i> {{ return_request.status|title }}
+                        </span>
+
+                    {% elif return_request.status == 'PICKUP_SCHEDULED' %}
+                        <span class="order-status pickup-scheduled">
+                            <i class="fas fa-calendar-check"></i> {{ return_request.status|title }}
+                        </span>
+
+                    {% elif return_request.status == 'PICKED_UP' %}
+                        <span class="order-status picked-up">
+                            <i class="fas fa-truck-loading"></i> {{ return_request.status|title }}
+                        </span>
+
+                    {% elif return_request.status == 'REFUNDED' %}
+                        <span class="order-status refunded">
+                            <i class="fas fa-wallet"></i> {{ return_request.status|title }}
+                        </span>
+
+                    {% elif return_request.status == 'REJECTED' %}
+                        <span class="order-status rejected">
+                            <i class="fas fa-times-circle"></i> {{ return_request.status|title }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="order-meta">
+                    <p class="meta-label">Order ID</p>
+                    <p class="meta-value">{{ order.uuid }}</p>
+                </div>
+            </div>
+
+            {% if return_request.status != 'REJECTED' %}
+            <!-- ORDER PROGRESS TRACKER -->
+            <div class="order-progress 
+                {% if return_request.status == 'REQUESTED' %}progress-1
+                {% elif return_request.status == 'APPROVED' or return_request.status == 'PICKUP_SCHEDULED' %}progress-2
+                {% elif return_request.status == 'PICKED_UP' %}progress-3
+                {% elif return_request.status == 'REFUNDED' %}progress-4{% endif %}">
+                <div class="progress-inner">
+
+                    <!-- Step 1 -->
+                    <div class="step step-placed {% if return_request.status == 'REQUESTED' %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Requested</div>
+                            <div class="date">{{ return_request.request_date|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Connector 1 -->
+                    <div class="connector c1"></div>
+
+                    <!-- Step 2 -->
+                    <div class="step step-shipped {% if return_request.status == 'APPROVED' or return_request.status == 'PICKUP_SCHEDULED'  %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Approved</div>
+                            <div class="date">{{ return_request.approved_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Connector 2 -->
+                    <div class="connector c2"></div>
+
+                    <!-- 🆕 Step 3: Out for Delivery -->
+                    <div class="step step-out {% if return_request.status == 'PICKED_UP' %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Picked Up</div>
+                            <div class="date">{% if return_request.pickedup_at %}{{ return_request.pickedup_at|date:"d M Y, h:i A"|default:"—" }}{% elif return_request.pickup_scheduled_for %}Scheduled For: {{ return_request.pickup_scheduled_for|date:"d M Y"|default:"—" }}{% else %}—{% endif %}</div>
+                        </div>
+                    </div>
+
+                    <!-- 🆕 Connector 3 -->
+                    <div class="connector c3"></div>
+
+                    <!-- Step 4 -->
+                    <div class="step step-delivered ">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Refunded</div>
+                            <div class="date">{{ return_request.refunded_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% elif return_request.status == 'REJECTED' %}
+
+            <div class="order-status-cancelled">
+                <i class="fas fa-times-circle"></i>
+                <div>
+                    <h3>Return Request Rejected</h3>
+                    <p>Your return request has been rejected</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="order-details">
+                <!-- Product Info - Full Width -->
+                <div class="product-info">
+                    <img src="{{ order.product.image_url }}" alt="Classic Cotton Tee" class="product-image">
+                    <div class="product-details">
+                        <div class="product-info-main">
+                            <h3 class="product-title">{{ order.product.name }}</h3>
+                            <div class="product-meta">
+
+                                <span>Category: {{ order.product.category }}</span>
+                                <span>Size: {{ order.variant.size }}</span>
+                                <span>Quantity: {{ order.quantity }}</span>
+                                
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="{% url 'product-details' order.product.uuid %}" class="btn btn-outline">View Product</a>
+                        </div>
+                    </div>
+                </div>
+
+
+                 <!-- 3️⃣ RETURN REASON & EVIDENCE -->
+                <div class="return-order-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-info-circle"></i> Return Reason</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-quote-left"></i> Reason</span>
+                            <span class="info-value important">{{ return_request.reason }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-comment"></i> Your Comments</span>
+                            <span class="info-value">“{{ return_request.comments }}”</span>
+                        </div>
+                        {% if return_request.product_image1 %}
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-images"></i> Uploaded Images</span>
+                            <div class="return-images">
+                                {% if return_request.product_image1 %}
+                                    <img src="{{ return_request.product_image1 }}" alt="Return Image 1">
+                                {% endif %}
+
+                                {% if return_request.product_image2 %}
+                                    <img src="{{ return_request.product_image2 }}" alt="Return Image 2">
+                                {% endif %}
+
+                                {% if return_request.product_image3 %}
+                                    <img src="{{ return_request.product_image3 }}" alt="Return Image 3">
+                                {% endif %}
+                            
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Delivery Address and Price Summary - Side by Side -->
+                <div class="details-row">
+                    <div class="delivery-address">
+                        <h4 class="section-title">Pickup Address</h4>
+                        <div class="address-details">
+                            <p><strong>{{ address.full_name }}</strong></p>
+                            <p>{{ address.address_line }}</p>
+                            <p>PIN: {{ address.pincode }}</p>
+                            <p>{{ address.city }}, {{ address.state }}</p>
+                            <p>{{ address.phone }}{% if address.second_phone %} ,{{address.second_phone}}{% endif %}</p>
+                        </div>
+                        <!-- <a href="#" class="btn btn-outline">Change Delivery Address</a> -->
+                    </div>
+
+                    <div class="refund-summary">
+                        <h4 class="section-title">Refund Summary</h4>
+
+                        <div class="price-row">
+                            <span>Item Price</span>
+                            <span>₹{{ return_request.order_item.sub_total }}</span>
+                        </div>
+
+                        <!-- <div class="price-row">
+                            <span>Tax (GST/VAT)</span>
+                            <span>₹{{ return_request.order_item.tax_amount }}</span>
+                        </div> -->
+
+                        <div class="price-row">
+                            <span>Delivery Fee</span>
+                            <span>+ ₹{{ return_request.order_item.delivery_fee }}</span>
+                        </div>
+
+                        {% if return_request.order_item.discount_amount and return_request.order_item.discount_amount != 0 %}
+                        <div class="price-row">
+                            <span>Discount Applied</span>
+                            <span class="discount-price">- ₹{{ return_request.order_item.discount_amount }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if order.order.coupon_applied %}
+                        <div class="price-row">
+                            <span>Coupon <span class="discount-price" >({{ order.order.coupon_applied.code }})</span></span>
+                            <span class="discount-price">-₹{{ order.coupon_discount_amount }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="price-row total">
+                            <span>Amount Paid</span>
+                            <span>₹{{ return_request.amount_paid }}</span>
+                        </div>
+
+                        {% if return_request.refunded_amount %}
+                        <div class="price-row total refunded">
+                            <span>Refunded Amount</span>
+                            <span>₹{{ return_request.refunded_amount }}</span>
+                        </div>
+                        {% else %}
+                        <div class="price-row total pending">
+                            {% if return_request.status == 'REFUNDED' %}
+                            <span>Refund Amount </span>
+                            {% else %}
+                            <span>Refund Amount (Pending)</span>
+                            {% endif %}
+                            <span>₹{{ return_request.amount_paid }}</span>
+                        </div>
+                        {% endif %}
+                        {% if return_request.status == 'PICKED_UP' %}
+                         <span>(money will be refunded within 7 days of return)</span>
+                         {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Action Buttons
+            <div class="action-buttons">
+                {% if return_request.status == "DELIVERED" %}
+                <a href="#" class="btn btn-primary">Download Invoice</a>
+                {% endif %}
+                {% if return_request.status == "REQUESTED" or return_request.status == "SHIPPED" or return_request.status == "SHIPPED" %}
+                    <button onclick="openDangerModal()" class="btn btn-danger">Cancel Order</button>
+                {% endif %}
+                {% if return_request.status == "DELIVERED" %}
+                    <a href="{% url 'return-request-form' order.uuid %}" class="btn btn-danger">Return Order</a>
+                {% endif %}
+            </div> -->
+        </div>
+    </div>
+
+<!-- CANCEL ORDER CONFIRMATION MODEL -->
+<div class="danger_modal-overlay" id="dangerModel">
+    <div class="danger_modal">
+        <div class="danger_modal-header">
+            <h2 class="danger_modal-title">Cancel Order</h2>
+        </div>
+        <div class="danger_modal-body">
+            <p class="danger_modal-message">Are you sure you want to cancel order for<strong id="deleteStyleId"> {{ order.product.name }} </strong>? This action cannot be undone.</p>
+        </div>
+        <div class="danger_modal-actions">
+            <button class="danger_modal-btn danger_modal-btn-cancel" onclick="closeDangerModal()">Cancel</button>
+            <form action="{% url 'cancel-order' order.uuid %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="danger_modal-btn danger_modal-btn-confirm">Confirm</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'order/js/track_return.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,19 @@
+    <!-- Toast Container -->
+<div class="toast-container" id="toastContainer">
+        <!-- Success Toast Example (visible for design review - Django will control visibility) -->
+         {% for message in messages %}
+        <div class="toast {{ message.tags }}" id="{% if 'success' in message.tags %}toastSuccess{% elif 'error' in message.tags %}toastError{%endif%}">
+            <div class="toast-icon">{% if 'success' in message.tags %}✓{% elif 'error' in message.tags %}✕{%endif%}</div>
+            <div class="toast-content">
+                <div class="toast-title">{% if 'success' in message.tags %}Success{% elif 'error' in message.tags %}Error{%endif%}</div>
+                <div class="toast-message">{{ message }}</div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this)">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+</div>

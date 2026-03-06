@@ -1,0 +1,203 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/admin/list.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Order Management</h1>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'admin-list-orders' %}" id="searchForm" class="search-form">
+
+
+            <!--to preserve filter query params-->
+            {% if request.GET.date_range %}
+            <input type="hidden" name="date_range" value="{{ request.GET.date_range }}">
+            {% endif %}
+            {% if request.GET.payment_method %}
+            <input type="hidden" name="payment_method" value="{{ request.GET.payment_method }}">
+            {% endif %}
+            {% if request.GET.payment_status %}
+            <input type="hidden" name="payment_status" value="{{ request.GET.payment_status }}">
+            {% endif %}
+            {% if request.GET.order_status %}
+            <input type="hidden" name="order_status" value="{{ request.GET.order_status }}">
+            {% endif %}
+
+
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search Orders by ID, Product name, Customer name.." id="searchInput"
+                        value="{{ request.GET.search }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+
+                    <!--search field clear button-->
+                    <div class="search-actions">
+                        <a href="{% url 'admin-list-orders' %}??{% for key, value in request.GET.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">
+                            <button type="button" class="clear-btn" id="clearBtn">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </a>
+                    </div>
+
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()">
+                    <span class="filter-icon"></span>
+                    <span>Filters</span>
+                </button>
+            </div>
+        </form>
+        <!-- Filters Form -->
+        <form method="GET" action="" id="filterForm" class="filter-form">
+            {% if request.GET.search %}
+            <input type="hidden" value="{{ request.GET.search }}" name="search">
+            {% endif %}
+            <div class="filters-container {% if request.GET.date_range or request.GET.payment_method or request.GET.payment_status or request.GET.order_status %}show{% endif %}" id="filtersContainer">
+                <div class="filters-row">
+
+                    <div class="filter-group">
+                        <select name="date_range" id="categorySelect" class="filter-select">
+                            <option value="">Date Range</option>
+                            <option value="today" {% if request.GET.date_range == 'today' %}selected {% endif %}>Today</option>
+                            <option value="week" {% if request.GET.date_range == 'week' %}selected {% endif %}>This Week
+                            </option>
+                            <option value="month" {% if request.GET.date_range == 'month' %}selected {% endif %}>This Month
+                            </option>
+                            <option value="year" {% if request.GET.date_range == 'year' %}selected {% endif %}>This Year
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="payment_method" id="categorySelect" class="filter-select">
+                            <option value="">Payment method</option>
+                            <option value="cod" {% if request.GET.payment_method == 'cod' %}selected{% endif %}>COD</option>
+                            <option value="credit_card" {% if request.GET.payment_method == 'credit_card' %}selected{% endif %}>CREDIT_CARD</option>
+                            <option value="debit_card" {% if request.GET.payment_method == 'debit_card' %}selected{% endif %}>DEBIT_CARD</option>
+                            <option value="upi" {% if request.GET.payment_method == 'upi' %}selected{% endif %}>UPI</option>
+                             <option value="wallet" {% if request.GET.payment_method == 'wallet' %}selected{% endif %}>WALLET</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="payment_status" id="stockSelect" class="filter-select">
+                            <option value="">Payment Status</option>
+                            <option value="pending" {% if request.GET.payment_status == 'pending' %}selected{% endif %}>PENDING</option>
+                            <option value="paid"  {% if request.GET.payment_status == 'paid' %}selected{% endif %}>PAID</option>
+                            <option value="failed" {% if request.GET.payment_status == 'failed' %}selected{% endif %}>FAILED</option>
+                            <option value="cod" {% if request.GET.payment_status == 'cod' %}selected{% endif %}>COD</option>
+                            <option value="refunded" {% if request.GET.payment_status == 'refunded' %}selected{% endif %}>REFUNDED</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="order_status" id="priceSelect" class="filter-select">
+                            <option value="">Order Status</option>
+                            <option value="initiated" {% if request.GET.order_status == 'initiated' %}selected{% endif %}>INITIATED</option>
+                            <option value="placed" {% if request.GET.order_status == 'placed' %}selected{% endif %}>PLACED</option>
+                            <option value="shipped" {% if request.GET.order_status == 'shipped' %}selected{% endif %}>SHIPPED</option>
+                            <option value="out_for_delivery" {% if request.GET.order_status == 'out_for_delivery' %}selected{% endif %}>OUT FOR DELIVERY</option>
+                            <option value="delivered" {% if request.GET.order_status == 'delivered' %}selected{% endif %}>DELIVERED</option>
+                            <option value="cancelled" {% if request.GET.order_status == 'cancelled' %}selected{% endif %}>CANCELLED</option>
+                            <option value="returned" {% if request.GET.order_status == 'returned' %}selected{% endif %}>RETURNED</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-apply" id="applyFiltersBtn">Apply Filters</button>
+                    <a href="{% url 'admin-list-orders' %}">
+                        <button type="button" class="btn btn-reset" id="resetFiltersBtn">Rest Filters</button>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Product Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ORDER ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Total Amount</th>
+                    <th>Payment Method</th>
+                    <th>Payment Status</th>
+                    <th>Order Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for order in page_obj %}
+                <tr>
+                    <td class="order-id">{{ order.uuid }}</td>
+                    <td class="customer-name">
+                        {{ order.order.user.full_name }}
+                    </td>
+                    <td class="product-name">{{ order.product.name }}</td>
+                    <td class="total-amount">₹{{ order.total }}</td>
+                    <td class="payment_method">{% if order.order.payment_method == 'ONLINE_PAYMENT' %}ONLINE{% else %}{{ order.order.payment_method }}{% endif %}</td>
+                    <td class="payment_status">
+                        <span {% if order.payment_status == 'PAID' %}style="color: #065f46;"{% endif %} class="status-badge status-active">{{ order.payment_status }}</span>
+                    </td>
+                    <td class="order-status">
+                        <span class="status-badge status-{{ order.order_status|lower|slugify }}">
+                            {{ order.order_status }}
+                        </span>
+                    </td>
+                    <td class="order-date">
+                        {{ order.placed_at.date }}
+                    </td>
+                    <td>
+                        <a href="{% url 'admin-order-details' order.uuid %}">
+                            <button class="btn-view">View</button>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'product/admin/js/list.js' %}"></script>
+{% endblock %}

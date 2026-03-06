@@ -1,0 +1,128 @@
+<!--
+README
+-----
+1]For using this component first include it's html, css, and js to the desired file.
+2]Create a btn for opening the modal, add the following function invoke when onclick='openAddAddressModal()'
+
+ALL SET!!
+-->
+
+<!-- Add Address Modal -->
+<div class="modal" id="addAddressModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-map-marker-alt"></i> Add New Address</h3>
+            <button class="close-modal" id="closeAddModel" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+
+            <form action="{% url 'add-address' %}" method="post" id="addressForm">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <div class="form-section">
+                    <h4 class="section-title">Contact Information</h4>
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="fullName">Full Name <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="full_name" id="fullName" placeholder="full name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" name="phone" placeholder="primary number" id="phone" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="altPhone">Alternative Phone (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone-alt"></i>
+                                <input type="tel" name="second_phone" placeholder="alternative phone number" id="altPhone">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">Address Details</h4>
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <label for="address">Address Line <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <input type="text" name="address_line" placeholder="address line" id="address" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city">City <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-city"></i>
+                                <input type="text" name="city" placeholder="city" id="city" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state">State <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-flag"></i>
+                                <input type="text" name="state" id="state" placeholder="state" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="zipCode">PIN Code <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-mail-bulk"></i>
+                                <input type="text" name="pincode" id="zipCode" placeholder="pincode" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="addressType">Address Type <span class="required">*</span></label>
+                            <div class="select-wrapper">
+                                <i class="fas fa-tag"></i>
+
+                                <select name="type" id="addressType" required>
+                                    <option value="" disabled selected>Select address type</option>
+                                    <option value="home">Home</option>
+                                    <option value="work">Work</option>
+                                    <option value="other">Other</option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-options">
+                        <label class="checkbox-container">
+                            <input name="is_default" value="True" type="checkbox" id="defaultAddress">
+                            <span class="checkmark"></span>
+                            Set as default shipping address
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="btn-outline" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Address
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

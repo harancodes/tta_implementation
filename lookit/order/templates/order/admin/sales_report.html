@@ -1,0 +1,183 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/admin/sales_report.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Breadcrumb Navigation -->
+    <!-- <nav class="breadcrumb">
+        <ol>
+            <li><a href="home.html">Home</a></li>
+            <li>Analytics</li>
+            <li>Sales Report</li>
+        </ol>
+    </nav> -->
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Sales Report</h1>
+    </div>
+
+    <!-- Filter Section -->
+   
+    <div class="filter-section">
+            <form method="get">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="fromDate">FROM</label>
+                        <input type="text" id="fromDate" value="{{ request.GET.from_date }}" name="from_date" class="date-picker" placeholder="Select start date">
+                    </div>
+                    <div class="filter-group">
+                        <label for="toDate">TO</label>
+                        <input type="text" id="toDate" value="{{ request.GET.to_date }}" name="to_date" class="date-picker" placeholder="Select end date">
+                    </div>
+                    <input type="hidden" name="range" value="{{ request.GET.range }}" id="rangeInput">
+                    <button type="submit" class="btn btn-primary" style="margin-bottom: 4px; height: 32px; min-width: 100px; padding: 0 20px;">Filter</button>
+                </div>
+            </form>
+            <div class="date-range-buttons">
+                <button class="date-range-btn {% if not request.GET.range %}active{% endif %}"><span>Today</span></button>
+                <button value="this-week" class="date-range-btn {% if request.GET.range == 'this-week' %} active {% endif %}"><span>This Week</span></button>
+                <button value="this-month" class="date-range-btn {% if request.GET.range == 'this-month' %} active {% endif %}"><span>This Month</span></button>
+                <button value="this-year" class="date-range-btn {% if request.GET.range == 'this-year' %} active {% endif %}"><span>This Year</span></button>
+                <button value="custom" class="date-range-btn {% if request.GET.range == 'custom' %} active {% endif %}"><span>Custom</span></button>
+            </div>
+      
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+                <div class="stat-card">
+            <h3>TOTAL ORDER COUNT</h3>
+            <div class="stat-value">{{ report_summary.total_order_count|stringformat:'02d' }}</div>
+            <!-- <div class="stat-change">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                12.5% from last period
+            </div> -->
+        </div>
+        <div class="stat-card">
+            <h3>TOTAL ORDER VALUE</h3>
+            <div class="stat-value">₹{{ report_summary.total_order_value }}</div>
+            <!-- <div class="stat-change">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                12.5% from last period
+            </div> -->
+        </div>
+        <div class="stat-card">
+            <h3>REALIZED REVENUE</h3>
+            <div class="stat-value">₹{{ report_summary.realized_revenue }}</div>
+            <!-- <div class="stat-change">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                8.2% from last period
+            </div> -->
+        </div>
+        <div class="stat-card">
+            <h3>TOTAL DISCOUNTS</h3>
+            <div class="stat-value">₹{{ report_summary.total_discounts }}</div>
+            <!-- <div class="stat-change down">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                3.1% from last period
+            </div> -->
+        </div>
+    </div>
+
+    <!-- Download Report Button -->
+     <div style="display: flex; gap: 20px;">
+     <form action="{% url 'sales-report-pdf' %}">
+        <input type="hidden" name="start_date" value="{{ request.GET.from_date }}" id="">
+        <input type="hidden" name="end_date" value="{{ request.GET.to_date }}" id="">
+        <button type="submit" class="btn btn-download" style="margin-bottom: 25px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Report (PDF)
+        </button>
+    </form>
+
+    <!-- Download Report Button -->
+     <form action="{% url 'sales-report-excel' %}">
+        <input type="hidden" name="start_date" value="{{ request.GET.from_date }}" id="">
+        <input type="hidden" name="end_date" value="{{ request.GET.to_date }}" id="">
+        <button class="btn btn-download" style="margin-bottom: 25px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Report (Excel)
+        </button>
+    </form>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>ORDER ID</th>
+                        <th>Date</th>
+                        <th>CUSTOMER</th>
+                        <th>PRODUCT</th>
+                        <th>PAYMENT</th>
+                        <th>COUPON</th>
+                        <th>DISCOUNT</th>
+                        <th>FINAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in page_obj %}
+                    <tr>
+                        <td>{{ order.uuid }}</td>
+                        <td>{{ order.placed_at.date }}</td>
+                        <td>{{ order.order.user.full_name }}</td>
+                        <td>{{ order.product.name|truncatechars:25 }} ({{ order.quantity }})</td>
+                        <td>{% if order.order.payment_method == 'ONLINE_PAYMENT' %}Razorpay{% else %}{{ order.order.payment_method }}{% endif %}</td>
+                        <td>{% if order.order.coupon_applied %}
+                            {{ order.order.coupon_applied.code|default:'-' }} 
+                            <span class="coupon-deduction">(-₹{{ order.coupon_discount_amount }})</span></td>
+                            {% else %}
+                            -
+                            {% endif %}
+                        <td>-₹{{ order.discount_amount }}</td>
+                        <td>₹{{ order.total }}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'admin_base/components/table_empty_state.html' with message="No sales recorded for the selected period." %}
+                    {% endfor %}
+
+                </tbody>
+            </table>
+                    <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'order/js/admin/sales_report.js' %}"></script>
+{% endblock %}

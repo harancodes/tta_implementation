@@ -1,0 +1,34 @@
+<!-- Top Navbar -->
+<nav class="top-navbar">
+    <div class="navbar-left">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <div class="navbar-title">Lookit Admin</div>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user" id="navbarUser" onclick="toggleUserDropdown(event)">
+            {% if request.user.profile_img_url %}
+            <img src="{{ request.user.profile_img_url }}" alt="" class="user-avatar">
+            {% else %}
+            <div class="user-avatar">A</div>
+            {% endif %}
+            <span>Admin</span>
+            
+            <div class="user-dropdown" id="userDropdown">
+                <button class="user-dropdown-item" onclick="viewProfile()">
+                    <span>👤</span>
+                    <span>View Profile</span>
+                </button>
+                <button class="user-dropdown-item" onclick="openSettings()">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </button>
+                <a style="text-decoration: none;" href="{% url 'admin-logout' %}">
+                    <button class="user-dropdown-item logout">
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

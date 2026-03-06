@@ -1,0 +1,235 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/track_order.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+{% endblock %}
+
+{% block content %}
+<!--main content-->
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'my-orders' %}">My Orders</a></li>
+                <li aria-current="page">Track Order</li>
+            </ol>
+        </nav>
+
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                {% if order.order_status == 'PLACED' %}
+                    <span class="order-status placed">
+                        <i class="fas fa-box-open"></i> {{ order.order_status|title }}
+                    </span>
+
+                {% elif order.order_status == 'SHIPPED' or order.order_status == 'OUT_FOR_DELIVERY' %}
+                    <span class="order-status shipped">
+                        <i class="fas fa-truck"></i> {{ order.order_status|title }}
+                    </span>
+
+                {% elif order.order_status == 'DELIVERED' %}
+                    <span class="order-status delivered">
+                        <i class="fas fa-check-circle"></i> {{ order.order_status|title }}
+                    </span>
+
+                {% elif order.order_status == 'CANCELLED' %}
+                    <span class="order-status order-cancelled">
+                        <i class="fas fa-times-circle"></i> {{ order.order_status|title }}
+                    </span>
+                {% endif %}
+
+                </div>
+                <div class="order-meta">
+                    <p class="meta-label">Order ID</p>
+                    <p class="meta-value">{{ order.uuid }}</p>
+                </div>
+            </div>
+
+            {% if order.order_status != 'CANCELLED' %}
+            <!-- ORDER PROGRESS TRACKER -->
+            <div class="order-progress 
+                {% if order.order_status == 'PLACED' %}progress-1
+                {% elif order.order_status == 'SHIPPED' %}progress-2
+                {% elif order.order_status == 'OUT_FOR_DELIVERY' %}progress-3
+                {% elif order.order_status == 'DELIVERED' %}progress-4{% endif %}">
+                <div class="progress-inner">
+
+                    <!-- Step 1 -->
+                    <div class="step step-placed {% if order.order_status == 'PLACED' %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Placed</div>
+                            <div class="date">{{ order.placed_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Connector 1 -->
+                    <div class="connector c1"></div>
+
+                    <!-- Step 2 -->
+                    <div class="step step-shipped {% if order.order_status == 'SHIPPED' %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Shipped</div>
+                            <div class="date">{{ order.shipped_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Connector 2 -->
+                    <div class="connector c2"></div>
+
+                    <!-- 🆕 Step 3: Out for Delivery -->
+                    <div class="step step-out {% if order.order_status == 'OUT_FOR_DELIVERY' %}active{% endif %}">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Out for Delivery</div>
+                            <div class="date">{{ order.out_for_delivery_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- 🆕 Connector 3 -->
+                    <div class="connector c3"></div>
+
+                    <!-- Step 4 -->
+                    <div class="step step-delivered ">
+                        <div class="step-circle"><span class="inner">✓</span></div>
+                        <div class="step-text">
+                            <div class="title">Delivered</div>
+                            <div class="date">{{ order.delivered_at|date:"d M Y, h:i A"|default:"—" }}</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% elif order.order_status == 'CANCELLED' %}
+
+            <div class="order-status-cancelled">
+                <i class="fas fa-times-circle"></i>
+                <div>
+                    <h3>Order Cancelled</h3>
+                    <p>This order was cancelled on <strong>{{ order.cancelled_at|date:"M d, Y h:i A" }}</strong>.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if order.return_request %}
+            <div class="order-status-cancelled">
+                <i class="fas fa-times-circle"></i>
+                <div>
+                    <h3>Return Request Submitted.</h3>
+                    <p>Request for return submitted at <strong>{{ order.return_request.request_date|date:"M d, Y h:i A" }}</strong>.</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="order-details">
+                <!-- Product Info - Full Width -->
+                <div class="product-info">
+                    <img src="{{ order.product.image_url }}" alt="Classic Cotton Tee" class="product-image">
+                    <div class="product-details">
+                        <div class="product-info-main">
+                            <h3 class="product-title">{{ order.product.name }}</h3>
+                            <div class="product-meta">
+
+                                <span>Category: {{ order.product.category }}</span>
+                                <span>Size: {{ order.variant.size }}</span>
+                                <span>Quantity: {{ order.quantity }}</span>
+                                
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="{% url 'product-details' order.product.uuid %}" class="btn btn-outline">View Product</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Address and Price Summary - Side by Side -->
+                <div class="details-row">
+                    <div class="delivery-address">
+                        <h4 class="section-title">Delivery Address</h4>
+                        <div class="address-details">
+                            <p><strong>{{ address.full_name }}</strong></p>
+                            <p>{{ address.address_line }}</p>
+                            <p>PIN: {{ address.pincode }}</p>
+                            <p>{{ address.city }}, {{ address.state }}</p>
+                            <p>{{ address.phone }}{% if address.second_phone %} ,{{address.second_phone}}{% endif %}</p>
+                        </div>
+                        <!-- <a href="#" class="btn btn-outline">Change Delivery Address</a> -->
+                    </div>
+
+                    <div class="price-summary">
+                        <h4 class="section-title">Price & Payment</h4>
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span>₹{{ order.sub_total }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Shipping</span>
+                            <span>+ ₹{{ order.delivery_fee }}</span>
+                        </div>
+                        {% if order.discount_amount != 0 %}
+                        <div class="price-row">
+                            <span>Discount</span>
+                            <span class="discount-price">-₹{{ order.discount_amount }}</span>
+                        </div>
+                        {% endif %}
+                        {% if order.order.coupon_applied %}
+                        <div class="price-row">
+                            <span>Coupon <span class="discount-price" >({{ order.order.coupon_applied.code }})</span></span>
+                            <span class="discount-price">-₹{{ order.coupon_discount_amount }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="price-row total">
+                            <span>Total</span>
+                            <span>₹{{ order.total }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                {% if order.order_status == "DELIVERED" %}
+                <a href="{% url 'invoice' order.uuid %}" target="_blank" class="btn btn-primary">Download Invoice</a>
+                {% endif %}
+                {% if order.order_status == "PLACED" or order.order_status == "SHIPPED" or order.order_status == "SHIPPED" %}
+                    <button onclick="openDangerModal()" class="btn btn-danger">Cancel Order</button>
+                {% endif %}
+                {% if order.order_status == "DELIVERED" and not order.return_request and eligible_for_return %}
+                    <a href="{% url 'return-request-form' order.uuid %}" class="btn btn-danger">Return Order</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<!-- CANCEL ORDER CONFIRMATION MODEL -->
+<div class="danger_modal-overlay" id="dangerModel">
+    <div class="danger_modal">
+        <div class="danger_modal-header">
+            <h2 class="danger_modal-title">Cancel Order</h2>
+        </div>
+        <div class="danger_modal-body">
+            <p class="danger_modal-message">Are you sure you want to cancel order for<strong id="deleteStyleId"> {{ order.product.name }} </strong>? This action cannot be undone.</p>
+        </div>
+        <div class="danger_modal-actions">
+            <button class="danger_modal-btn danger_modal-btn-cancel" onclick="closeDangerModal()">Cancel</button>
+            <form action="{% url 'cancel-order' order.uuid %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="danger_modal-btn danger_modal-btn-confirm">Confirm</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'order/js/track_order.js' %}"></script>
+{% endblock %}

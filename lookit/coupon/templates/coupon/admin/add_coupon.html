@@ -1,0 +1,130 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'coupon/css/admin/add_coupon.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-coupons' %}">Coupon Management</a>
+        <span>/</span>
+        <span>Add Coupon</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Add New Coupon</h1>
+    </div>
+
+    <!-- Coupon Form -->
+    <div class="form-container">
+        <form id="couponForm" action="{% url 'admin-add-coupon' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="couponCode">Coupon Code</label>
+                        <input type="text" name="code" id="couponCode" class="form-control"
+                            placeholder="Enter coupon code" required>
+                        <small class="form-hint">
+                            <svg style="width:12px;height:12px;vertical-align:middle;margin-right:4px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12" y2="8"></line>
+                            </svg>
+                            Coupon code cannot be edited once created.
+                        </small>
+                    </div>    
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="discountType">Discount Type</label>
+                        <select id="discountType" name="discount_type" class="form-control" required>
+                            <option value="">Select discount type</option>
+                            <option value="PERCENTAGE">Percentage</option>
+                            <option value="FLAT">Fixed Amount</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="discountValue">Discount Value</label>
+                        <input type="number" name="discount_value" id="discountValue" class="form-control"
+                            placeholder="Enter discount value" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="minPurchase">Minimum Purchase Amount</label>
+                        <input type="number" name="min_purchase_amount" value="0" id="minPurchase" class="form-control"
+                            placeholder="Enter minimum amount" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" name="start_date" id="startDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" name="end_date" id="endDate" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="usageLimit">Usage Limit (Optional)</label>
+                        <input type="number" name="usage_limit" id="usageLimit" class="form-control"
+                            placeholder="Leave empty for unlimited" min="1">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div style="display: flex; align-items: center; height: 38px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="status" value="True" id="status" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span id="statusText" style="margin-left: 10px;">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'admin-list-coupons' %}">
+                    <button type="button" class="btn btn-outline">Cancel</button>
+                </a>
+                <button type="submit" class="btn btn-primary">Save Coupon</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+</script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--form validation-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="{% static 'coupon/js/admin/add_coupon.js' %}"></script>
+{% endblock %}

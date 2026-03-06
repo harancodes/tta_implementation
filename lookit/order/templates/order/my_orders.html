@@ -1,0 +1,155 @@
+
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'user/css/profile_container.css' %}">
+<link rel="stylesheet" href="{% static 'order/css/my_orders.css' %}">
+<!--CSS for profile sidebar-->
+<link rel="stylesheet" href="{% static 'user/css/components/profile_sidebar.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+<div class="profile-container">
+<!-- Sidebar -->
+{% include 'user_base/components/profile_sidebar.html' %}
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="page-header">
+        <h1 class="page-title">My Orders</h1>
+
+        <div class="search-orders">
+            <form action="{% url  'my-orders' %}">
+                <input name="search" type="text" value="{{ request.GET.search }}" placeholder="Search orders...">
+            </form>
+            <span class="search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <a href="{% url  'my-orders' %}">
+                <button type="button" class="clear-search" aria-label="Clear search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="cart-items">
+
+        {% for item in orders %}
+        <div class="cart-item {% if item.order_status == 'CANCELLED' %}order-cancelled{% elif item.return_request.status == 'PICKED_UP' %}order-returned {% elif item.return_request.status == 'REFUNDED'  %}order-refunded{% elif item.return_request.status %}return-requested{% endif %}">
+
+            <!--banner for return or cancel-->
+            {% if item.order_status == 'CANCELLED' %}
+              <div class="cancelled-badge">CANCELLED</div>
+            {% elif item.return_request.status == 'REFUNDED'  %}
+              <div class="order-badge refunded-badge">REFUNDED</div>
+            {% elif item.return_request.status == 'PICKED_UP'  %}
+                <div class="order-badge returned-badge">RETURNED</div>
+            {% elif item.return_request.status %}
+                <div class="order-badge returned-badge">Return Pending</div>
+            {% endif %}
+            <a href="{% url 'product-details' item.product.uuid %}">
+            <img src="{{ item.product.image_url }}" alt="Product" class="item-image">
+            </a>
+            <div class="item-details">
+                <h3 class="item-title">{{ item.product.name }}</h3>
+                <p class="item-sku">ID: {{ item.uuid }}</p>
+                <p class="item-size">Size: M</p>
+                <p class="item-color">Ordered at: {{ item.created_at.date }}</p>
+                <div class="item-actions">
+                    <!-- <a href="{% url 'product-details' item.product.uuid %}">
+                        <button class="btn btn-view">View Product</button>
+                    </a> -->
+                    <a href="{% url 'track-order' item.uuid %}">
+                        <button class="btn btn-track">{% if item.return_request or item.order_status == 'CANCELLED' or item.order_status == 'DELIVERED' %}Order Details{% else %}Track Order{% endif %}</button>
+                    </a>
+                    {% if item.review_eligible and not item.return_request %}
+                    <a href="{% url 'write-review' item.uuid %}">
+                        <button class="btn btn-review">Write a review</button>
+                    </a>
+                    {% elif item.reviewed and not item.return_request and item.order_status == 'DELIVERED' %}
+                    <button class="btn btn-review btn-reviewed" disabled>
+                        ✓ Review completed
+                    </button>
+                    {% endif %}
+
+                    {% if item.return_request %}
+                    <a href="{% url 'track_return_request' item.uuid %}">
+                        <button class="btn btn-return-track">Track Return</button>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="item-price-status">
+
+                <!--For showing status-->
+                {% with return_status=item.return_request.status %}
+                    {% if item.return_request %}
+                        {% if return_status == 'REQUESTED' %}
+                            <span class="status-badge status-processing">Return Requested</span>
+                        {% elif return_status == 'APPROVED' %}
+                            <span class="status-badge status-processing">Approved for Pickup</span>
+                        {% elif return_status == 'REFUNDED' %}
+                            <span class="status-badge status-processing">Refund Completed</span>
+                        {% endif %}
+                    {% else %}
+                        {% if item.order_status == 'INITIATED' %}
+                            <span class="status-badge status-initiated">Order Initiated</span>
+                        {% elif item.order_status == 'PLACED' %}
+                            <span class="status-badge status-placed">Order Placed</span>
+                        {% elif item.order_status == 'SHIPPED' %}
+                            <span class="status-badge status-shipped">Shipped</span>
+                        {% elif item.order_status == 'OUT_FOR_DELIVERY' %}
+                            <span class="status-badge status-out-for-delivery">Out for Delivery</span>
+                        {% elif item.order_status == 'DELIVERED' %}
+                            <span class="status-badge status-delivered">Delivered</span>
+                        {% elif item.order_status == 'CANCELLED' %}
+                            <span class="status-badge status-cancelled">Cancelled</span>
+                        {% elif item.order_status == 'RETURNED' %}
+                            <span class="status-badge status-returned">Returned</span>
+                        {% elif item.order_status == 'PROCESSING' %}
+                            <span class="status-badge status-processing">Processing</span>
+                        {% else %}
+                            <span class="status-badge status-unknown">{{ item.order_status|title }}</span>
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="item-price">₹{{ item.total }}</div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- No Orders Card -->
+        <div class="no-orders-card">
+            <div class="no-orders-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9a4d72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+            </div>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</main>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'order/js/my_orders.js' %}"></script>
+{% endblock %}
+

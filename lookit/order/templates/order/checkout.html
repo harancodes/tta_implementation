@@ -1,0 +1,173 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/checkout.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/components/address_modal.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'cart' %}">Shopping Cart</a>
+        <span>/</span>
+        <span>Checkout</span>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <h3>Order Summary</h3>
+<div class="product-table-container">
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Sub Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <td data-label="Product">
+                    <div class="product-info">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="product-image">
+                        <div>
+                            <div class="product-name">{{ item.product.name }}</div>
+                            <div class="product-variant">Size: {{ item.variant.size }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="product-price">
+                    {% if item.offer_price != item.product.price %}
+                        <div class="price-wrapper">
+                            <span class="price-current">₹{{ item.offer_price }}</span>
+                            <span class="price-old">₹{{ item.product.price }}</span>
+                        </div>
+                    {% else %}
+                        <div class="price-wrapper">
+                            <span class="price-current">₹{{ item.product.price }}</span>
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="product-quantity" data-label="Qty">{{ item.quantity }}</td>
+                <td class="product-total" data-label="Total">₹{{ item.sub_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    </div>
+
+    <div class="checkout-layout">
+        <div class="delivery-address">
+            <h3>Select Delivery Address</h3>
+            <div class="address-options">
+
+                {% for address in address_list %}
+                <div onclick="selectAddress(event, this, '{{ address.id }}')" class="address-option {% if address.is_default %}selected{% endif %}">
+                    <input type="radio" name="delivery-address" id="address-1" class="address-radio" {% if address.is_default %}checked{% endif %}>
+                    {% if address.is_default %}
+                        <input type="hidden" value="{{ address.id }}" id="defaultAddressHidden">
+                    {% endif %}
+                    <div class="address-details">
+                        <div class="address-header">
+                            <div class="address-name">{{ address.full_name }}</div>
+                            {% if address.is_default %}
+                            <span class="default-badge">Default</span>
+                            {% endif %}
+                        </div>
+                        <p class="address-text">{{ address.address_line }}, {{ address.city }}, {{ address.state }}, PIN: {{ address.pincode }}</p>
+                        <div class="address-phone">{{ address.phone }}{% if address.second_phone %}, alter: {{ address.second_phone }}{% endif %}</div>
+                        <div class="address-type">{{ address.type|upper }}</div>
+                        <div class="address-actions">
+
+                            <button onclick="openEditAddressModal('{{ address.id }}')" class="edit-address edit-address-btn" data-address-id="1">
+                                <i class="far fa-edit"></i> Edit
+                            </button>
+
+                            <form action="{% url 'delete-address' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="address_id" value="{{ address.id }}">
+                                <button class="remove-address" data-address-id="1">
+                                    <i class="far fa-trash-alt"></i> Remove
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Address Modal -->
+                {% include 'user_base/components/edit_address_modal.html' %}
+
+                {% endfor %}
+
+            </div>
+            <button onclick="openAddAddressModal()" class="add-address-btn">
+                <i class="fas fa-plus"></i> Add New Address
+            </button>
+        </div>
+
+        <div class="price-summary">
+            <h3>Price Details</h3>
+            <div class="price-row">
+                <span>Total</span>
+                <span class="price-value">₹{{ price_summary.sub_total }}</span>
+            </div>
+            {% if price_summary.offer_discount %}
+            <div class="price-row discount">
+                <span>Product Discounts</span>
+                <span class="price-value">-₹{{ price_summary.offer_discount }}</span>
+            </div>
+            {% endif %}
+            {% if price_summary.coupon_discount != 0 %}
+            <div class="price-row discount">
+                <span>Coupon Savings</span>
+                <span class="price-value">-₹{{ price_summary.coupon_discount }}</span>
+            </div>
+            {% endif %}
+            <div class="price-row">
+                <span>Shipping Fee</span>
+                <span class="price-value">₹{{ price_summary.delivery_fee }}</span>
+            </div>
+
+
+            <div class="price-row total">
+                <span>Final Amount</span>
+                <span class="price-value">₹{{ price_summary.grand_total }}</span>
+            </div>
+
+            <form action="{% url 'create_order' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="address_id" value="no-address" id="selectedAddressId">
+                <button class="checkout-btn">
+                    Continue to Payment
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+ {% include 'user_base/components/add_address_modal.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<!--FOR JQUERY FORM VALIDATION-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+<script src="{% static 'user/js/components/add_address_modal.js' %}"></script>
+<script src="{% static 'user/js/components/edit_address_modal.js' %}"></script>
+<script src="{% static 'order/js/checkout.js' %}"></script>
+{% endblock %}

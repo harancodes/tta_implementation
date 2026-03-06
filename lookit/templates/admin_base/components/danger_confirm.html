@@ -1,0 +1,155 @@
+<!--NOTE: CURRENTLY THIS IS JUST FOR COPY PASTE USE. NOT FOR INCLUDING AND REUSING-->
+
+<!-- Danger Confirmation Modal -->
+<div class="danger_modal-overlay" id="dangerModel">
+    <div class="danger_modal">
+        <div class="danger_modal-header">
+            <h2 class="danger_modal-title">Danger Style Category</h2>
+        </div>
+        <div class="danger_modal-body">
+            <p class="danger_modal-message">Are you sure you want to delete style category <strong id="deleteStyleId"> Oversized </strong>? This action cannot be undone and the
+                category will be
+                permanently
+                removed.</p>
+        </div>
+        <div class="danger_modal-actions">
+            <button class="danger_modal-btn danger_modal-btn-cancel" onclick="closeDangerModal()">Cancel</button>
+            <a href="#">
+                <button class="danger_modal-btn danger_modal-btn-confirm" >Danger</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ==============================
+   Modal Styles (Danger Modal)
+   ============================== */
+    .danger_modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .danger_modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .danger_modal {
+        background: white;
+        border-radius: 12px;
+        padding: 0;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .danger_modal-overlay.show .danger_modal {
+        transform: scale(1);
+    }
+
+    .danger_modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .danger_modal-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .danger_modal-body {
+        padding: 24px;
+    }
+
+    .danger_modal-message {
+        font-size: 0.95rem;
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .danger_modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        padding: 20px 24px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .danger_modal-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    /* Cancel Button */
+    .danger_modal-btn-cancel {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+
+    .danger_modal-btn-cancel:hover {
+        background: #d1d5db;
+    }
+
+    /* Confirm (Danger) Button */
+    .danger_modal-btn-confirm {
+        background: #ef4444;
+        color: white;
+    }
+
+    .danger_modal-btn-confirm:hover {
+        background: #dc2626;
+    }
+</style>
+
+<script>
+    // ==============================
+    // Danger Modal Functions
+    // ==============================
+
+    function openDangerModal() {
+        const danger_modal = document.getElementById('dangerModel');
+        if (danger_modal) danger_modal.classList.add('show');
+    }
+
+    function closeDangerModal() {
+        const danger_modal = document.getElementById('dangerModel');
+        if (danger_modal) danger_modal.classList.remove('show');
+    }
+
+    // Optional: Close danger_modal when clicking on overlay
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('danger_modal-overlay')) {
+            if (currentStyleId) closeDangerModal(currentStyleId);
+        }
+    });
+
+    // Optional: Close danger_modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && currentStyleId) {
+            closeDangerModal(currentStyleId);
+        }
+    });
+
+</script>

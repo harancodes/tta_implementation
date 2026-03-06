@@ -1,0 +1,44 @@
+ <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                <button class="pagination-btn">‹</button>
+            </a>
+            {% else %}
+            <button class="pagination-btn" disabled>‹</button>
+            {% endif %}
+
+    {# --- Page numbers logic --- #}
+    {% for number in page_obj.paginator.page_range %}
+        {% if number == 1 or number == page_obj.paginator.num_pages %}
+            {# Always show first and last page #}
+            {% if page_obj.number == number %}
+                <button class="pagination-btn active">{{ number }}</button>
+            {% else %}
+                <a href="?page={{ number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                    <button class="pagination-btn">{{ number }}</button>
+                </a>
+            {% endif %}
+        {% elif number >= page_obj.number|add:'-2' and number <= page_obj.number|add:'2' %}
+            {# Show window of 2 pages before and after current #}
+            {% if page_obj.number == number %}
+                <button class="pagination-btn active">{{ number }}</button>
+            {% else %}
+                <a href="?page={{ number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                    <button class="pagination-btn">{{ number }}</button>
+                </a>
+            {% endif %}
+        {% elif number == page_obj.number|add:'-3' or number == page_obj.number|add:'3' %}
+            {# Add ellipses before/after the visible range #}
+            <span class="pagination-ellipsis">...</span>
+        {% endif %}
+    {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                <button class="pagination-btn">›</button>
+            </a>
+            {% else %}
+            <button class="pagination-btn" disabled>›</button>
+            {% endif %}
+
+</div>

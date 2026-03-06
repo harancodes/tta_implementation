@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* body {
+            font-family: Helvetica;
+            font-size: 10pt;
+            color: #2d3748;
+        } */
+        body {
+            font-family: DejaVuSans;
+            font-size: 10pt;
+            color: #2d3748;
+        }
+
+
+        /* --- Headings --- */
+        h1 {
+            font-size: 20pt;
+            margin: 0;
+            color: #1a202c;
+        }
+
+        h2 {
+            font-size: 13pt;
+            margin-top: 4px;
+            color: #2f855a;
+            font-weight: normal;
+        }
+
+        /* --- Header --- */
+        .header-table {
+            width: 100%;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .meta {
+            font-size: 8.5pt;
+            text-align: right;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* --- Summary --- */
+        .summary-table {
+            width: 100%;
+            margin: 18px 0 22px 0;
+            border-collapse: collapse;
+        }
+
+        .summary-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            text-align: center;
+            background-color: #f8fafc;
+        }
+
+        .summary-title {
+            font-size: 8.5pt;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .summary-value {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-top: 4px;
+            color: #1a202c;
+        }
+
+        /* --- Orders table --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: #2d3748;
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 8px 6px;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        td {
+            font-size: 9pt;
+            padding: 7px 6px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #fafafa;
+        }
+
+        /* --- Amount styling --- */
+        .amount {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .discount {
+            color: #c53030;
+        }
+
+        .coupon-deduction {
+            font-size: 8pt;
+            color: #718096;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<table class="header-table">
+    <tr>
+        <td>
+            <h1>LookIt</h1>
+            <h2>Sales Report</h2>
+        </td>
+        <td class="meta">
+            Generated on {{ generated_on }}<br>
+            Reporting period<br>
+            {{ start_date }} – {{ end_date }}
+        </td>
+    </tr>
+</table>
+
+<!-- SUMMARY -->
+<table class="summary-table">
+    <tr>
+        <td>
+            <div class="summary-title">Total Orders</div>
+            <div class="summary-value">
+                {{ report_summary.total_order_count|stringformat:'02d' }}
+            </div>
+        </td>
+        <td>
+            <div class="summary-title">Total Value</div>
+            <div class="summary-value">
+                Rs. {{ report_summary.total_order_value }}
+            </div>
+        </td>
+        <td>
+            <div class="summary-title">Realized Revenue</div>
+            <div class="summary-value">
+                Rs. {{ report_summary.realized_revenue }}
+            </div>
+        </td>
+        <td>
+            <div class="summary-title">Discounts</div>
+            <div class="summary-value">
+                Rs. {{ report_summary.total_discounts }}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- ORDERS TABLE -->
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Payment</th>
+            <th>Coupon</th>
+            <th>Discount</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in sales %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.created_at|date:"d M Y" }}</td>
+            <td>{{ order.order.user.full_name }}</td>
+            <td>{{ order.product.name }}</td>
+            <td>
+                {% if order.order.payment_method == 'ONLINE_PAYMENT' %}
+                    Razorpay
+                {% else %}
+                    {{ order.order.payment_method }}
+                {% endif %}
+            </td>
+            <td>
+                {% if order.order.coupon_applied %}
+                    {{ order.order.coupon_applied.code }}
+                    <div class="coupon-deduction">
+                        (-Rs. {{ order.coupon_discount_amount }})
+                    </div>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="amount discount">
+                Rs. {{ order.discount_amount|default:"0.00" }}
+            </td>
+            <td class="amount">
+                Rs. {{ order.total }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

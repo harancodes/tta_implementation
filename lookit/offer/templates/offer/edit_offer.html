@@ -1,0 +1,166 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'offer/css/edit_offer.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-offers' %}">Offer Management</a>
+        <span>/</span>
+        <span>Create Offer</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Create New Offer</h1>
+    </div>
+
+    <!-- Offer Form -->
+    <div class="form-container">
+
+        <form id="offerForm" action="{% url 'admin-edit-offer' offer.uuid %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="_method" value="PUT">
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="offerTitle">Offer Title</label>
+                        <input type="text" name="name" id="offerTitle" value="{{ offer.name }}" class="form-control" placeholder="Enter offer title"
+                            required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="offerScope">Scope</label>
+                        <select id="offerScope" name="scope" class="form-control" required>
+                            <option value="product" {% if offer.scope == 'PRODUCT_BASED' %}selected{% endif %}>Product Based</option>
+                            <option value="category" {% if offer.scope == 'CATEGORY_BASED' %}selected{% endif %}>Category Based</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1] FOR SELECT PRODUCTS-->
+            <div class="form-row" id="productSelectRow" style="display: none;">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Select Products</label>
+                        <div class="searchable-dropdown" id="searchableDropdown">
+                            <div class="search-box" id="searchBox">
+                                <input type="text" class="search-input" id="productSearchInput"
+                                    placeholder="Search by name or ID...">
+                            </div>
+                            <div class="dropdown-options" id="dropdownOptions">
+                                <!-- Options will be populated by JS -->
+                            </div>
+                        </div>
+                        <div id="selectedPreview" class="selected-preview">
+                            <!-- Selected items preview will be shown here -->
+                        </div>
+                        <small class="text-muted"
+                            style="display: block; margin-top: 5px; color: #6b7280; font-size: 0.85rem;">Search
+                            and select multiple products.</small>
+                                                <!--Product empty error-->
+                        <small id="productEmptyError" class="product-empty-error hidden">
+                            Please select alteast one product.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2] FOR SELECT CATEGORY-->
+            <div class="form-row" id="categorySelectRow" style="display: none;">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="type">Style</label>
+                        <select id="categorySelect" id="type" class="select2 form-control" name="style">
+                            <option value="" disabled selected>Select Style</option>
+                            {% for style in styles %}
+                            <option value="{{ style.name }}" {% if offer.style == style %}selected{% endif %}>{{ style.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="discountPercentage">Discount Percentage (%)</label>
+                        <input type="number" value="{{ offer.discount }}" name="discount" id="discountPercentage" class="form-control"
+                            placeholder="Enter percentage" min="0" max="100" step="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" name="start_date" value="{{ offer.start_date|date:'Y-m-d' }}" id="startDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" name="end_date" value="{{ offer.end_date|date:'Y-m-d' }}" id="endDate" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div style="display: flex; align-items: center; height: 38px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="status" id="status" {% if offer.is_active %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                            <span id="statusText" style="margin-left: 10px;">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+ const availableProducts = JSON.parse('{{ products_json|escapejs }}');
+ let selectedProductIds = new Set();
+ let template = `
+{% for product in selected_products %}
+    selectedProductIds.add(Number('{{ product.id }}'));
+{% endfor %}
+`;
+eval(template);
+</script>
+<!-- jQuery (required for Select2, style searching) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--form validation-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'offer/js/edit_offer.js' %}"></script>
+
+{% endblock %}

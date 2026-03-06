@@ -1,0 +1,238 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'user/css/profile_container.css' %}">
+<link rel="stylesheet" href="{% static 'wallet/css/wallet.css' %}">
+<!--CSS for profile sidebar-->
+<link rel="stylesheet" href="{% static 'user/css/components/profile_sidebar.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<!-- Main Content -->
+<div class="profile-container">
+
+    <!-- Sidebar -->
+    {% include 'user_base/components/profile_sidebar.html' %}
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">My Wallet</h1>
+
+        <!-- Wallet Balance Card -->
+        <div class="wallet-balance-card">
+            <div class="wallet-card-content">
+                <div class="wallet-info">
+                    <h2>Wallet Balance</h2>
+
+                    <div class="balance-amount">
+                        <span>₹</span>
+                        <span id="walletBalance">{{ wallet.balance }}</span>
+                    </div>
+
+                    <div class="balance-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Added</span>
+                            <span class="stat-value">₹{{ summary.total_credit }}</span>
+                        </div>
+
+                        <div class="stat-item">
+                            <span class="stat-label">Total Spent</span>
+                            <span class="stat-value">₹{{ summary.total_debit }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wallet-actions">
+                    <button class="add-money-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Money
+                    </button>
+
+                    <div class="wallet-image">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                            <line x1="5" y1="15" x2="5.01" y2="15"></line>
+                            <line x1="9" y1="15" x2="9.01" y2="15"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallet-pattern-overlay"></div>
+        </div>
+
+        <!-- Transactions Section -->
+        <section class="transactions-section">
+            <h2>Recent Transactions</h2>
+            <div class="transactions-list">
+
+                {% for transaction in transactions %}
+                <!-- Transaction 1 -->
+                <div class="transaction-item">
+                    <div class="transaction-icon {% if transaction.transaction_type == 'credit' %}credit{% elif transaction.transaction_type == 'debit' %}debit{% endif %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L4 12l8 10 8-10z"></path>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-title">{{ transaction.label }}</div>
+                        <div class="transaction-meta">
+                            <span class="transaction-date">{{ transaction.formatted_created_at }}</span>
+                            <span class="transaction-type">{{ transaction.transaction_type }}</span>
+                            {% if  transaction.order_item %}
+                            <span class="transaction-order-id">
+                                    Order Item ID: {{ transaction.order_item.uuid }}
+                            </span>
+                            {% elif transaction.order %}
+                            <span class="transaction-order-id">
+                                Order ID: {{ transaction.order.uuid }}
+                            </span>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+                    {% if transaction.transaction_type == 'credit' %}
+                    <div class="transaction-amount credit">+ ₹{{ transaction.amount }}</div>
+                    {% elif transaction.transaction_type == 'debit' %}
+                    <div class="transaction-amount debit">- ₹{{ transaction.amount }}</div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="no-transactions">
+                    <div class="no-transactions-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+
+                    <div class="no-transactions-text">
+                        <h3>No transactions yet</h3>
+                        <p>Your wallet is ready. Once you add money or make a payment, your activity will appear here.
+                        </p>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+                <!-- Transaction 2 -->
+                <!-- <div class="transaction-item">
+                    <div class="transaction-icon debit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 22L4 12l8-10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-title">Order #12345</div>
+                        <div class="transaction-meta">
+                            <span class="transaction-date">Jul 15, 3:30 PM</span>
+                            <span class="transaction-type">Shopping</span>
+                        </div>
+                    </div>
+                    <div class="transaction-amount debit">-₹50.00</div>
+                </div> -->
+
+            </div>
+        </section>
+        </section>
+    </main>
+
+    <!-- Add Money Modal -->
+    <div class="modal-overlay" id="addMoneyModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Add Money</h3>
+                <button class="modal-close" id="closeModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="amount-input-container">
+                    <span class="currency-symbol">₹</span>
+                    <input type="number" id="amountInput" class="amount-input" placeholder="0" min="1" step="1"
+                        inputmode="numeric" pattern="\d*">
+                </div>
+
+                <div class="suggested-amounts">
+                    <button type="button" class="amount-option">₹100</button>
+                    <button type="button" class="amount-option">₹500</button>
+                    <button type="button" class="amount-option">₹1000</button>
+                    <button type="button" class="amount-option">₹2000</button>
+                </div>
+
+            </div>
+            <div class="payment-security">
+                <div class="secure-payment">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="M9 12l2 2 4-4"></path>
+                    </svg>
+                    <span>Secure Payment</span>
+                </div>
+                <div class="payment-methods">
+                    <svg viewBox="0 0 38 24" width="38" height="24" role="img" aria-label="Visa">
+                        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"
+                            fill="#1a1f71"></path>
+                        <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"
+                            fill="#FFF"></path>
+                        <path
+                            d="M28.3 10.1H28c-.4 1-.7 1.5-1 3-1 3.4-1.4 4.4-3.2 5.7-1.5 1-4 1.3-6 .1-2.4-1.5-3-2.8-4.3-6.3-.4-1.1-.8-2.2-1.2-2.7H7.7c-.4 0-.8.3-.9.8L5.1 16c-.1.5.2 1 .7 1.1h4.6c-.6 2.1-2.5 5.7-4.6 7.1 1.4.1 2.9 0 4.4-.5 1.9-.6 2-1.6 3.1-3.2 1.2-1.7 1.2-1.7 2.1-2.2 1.1-.5 2.1-.5 3.1-.1 1.3.5 1.8 1.3 3.3 2.4 1.3 1 2.8 1.8 4.5 2.1 1.7.3 4.1.1 5.9-.1 1.8-.2 2.6-.7 2.8-1.1l-2.1-2.5-3.2-3.6-2.2-2.5z"
+                            fill="#1a1f71"></path>
+                        <path
+                            d="M15.2 8.7c0-.3.2-.5.5-.5h4.4c.4 0 .7.1.9.5.2.4.4.9.4 1.5 0 .3-.1.5-.3.5h-5.1c-.2 0-.4-.2-.4-.5 0-.7.1-1.2.3-1.5z"
+                            fill="#1a1f71"></path>
+                    </svg>
+                    <svg viewBox="0 0 38 24" width="38" height="24" role="img" aria-label="Mastercard">
+                        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"
+                            fill="#1a1f71"></path>
+                        <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"
+                            fill="#FFF"></path>
+                        <path
+                            d="M28.3 10.1H28c-.4 1-.7 1.5-1 3-1 3.4-1.4 4.4-3.2 5.7-1.5 1-4 1.3-6 .1-2.4-1.5-3-2.8-4.3-6.3-.4-1.1-.8-2.2-1.2-2.7H7.7c-.4 0-.8.3-.9.8L5.1 16c-.1.5.2 1 .7 1.1h4.6c-.6 2.1-2.5 5.7-4.6 7.1 1.4.1 2.9 0 4.4-.5 1.9-.6 2-1.6 3.1-3.2 1.2-1.7 1.2-1.7 2.1-2.2 1.1-.5 2.1-.5 3.1-.1 1.3.5 1.8 1.3 3.3 2.4 1.3 1 2.8 1.8 4.5 2.1 1.7.3 4.1.1 5.9-.1 1.8-.2 2.6-.7 2.8-1.1l-2.1-2.5-3.2-3.6-2.2-2.5z"
+                            fill="#1a1f71"></path>
+                        <path
+                            d="M15.2 8.7c0-.3.2-.5.5-.5h4.4c.4 0 .7.1.9.5.2.4.4.9.4 1.5 0 .3-.1.5-.3.5h-5.1c-.2 0-.4-.2-.4-.5 0-.7.1-1.2.3-1.5z"
+                            fill="#1a1f71"></path>
+                    </svg>
+                    <svg viewBox="0 0 38 24" width="38" height="24" role="img" aria-label="UPI">
+                        <rect width="38" height="24" rx="3" fill="#5F259F" />
+                        <path
+                            d="M12 7v10h2v-4h1.5l2 4h2l-2-3.5c1.1-.7 1.5-1.6 1.5-3V7h-2v3.5c0 .6-.3 1.5-1 1.5h-1V7h-2z"
+                            fill="#FFF" />
+                        <path d="M26 7v6c0 2.2-1.3 4-4 4s-4-1.8-4-4V7h2v6c0 1.1.7 2 2 2s2-.9 2-2V7h2z" fill="#FFF" />
+                    </svg>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="proceedToPayBtn">Proceed to Pay</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    csrf_token = '{{ csrf_token }}'
+    create_wallet_topup_razorpay_url = "{% url 'create-wallet-topup' %}"
+</script>
+<!-- Razorpay's Javascript code. -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="{% static 'wallet/js/wallet.js' %}"></script>
+{% endblock %}

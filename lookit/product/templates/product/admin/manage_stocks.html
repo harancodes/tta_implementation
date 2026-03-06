@@ -1,0 +1,181 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'product/admin/css/manage_stocks.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-products' %}">Products</a>
+        <span>/</span>
+        <a class="truncate-text" href="{% url 'admin-view-product' product.uuid %}">{{ product.name }}</a>
+        <span>/</span>
+        <span>View Variants</span>
+    </div>
+
+    <!-- Product Header -->
+    <div class="product-header">
+        <div class="product-info">
+            <span class="product-status">Active</span>
+            <h1 class="product-name">{{ product.name }}</h1>
+            <div class="product-details">
+                Price: ₹{{ product.price }} | Total Stock: <span id="totalStock">{{ product.total_stock }}</span>
+            </div>
+        </div>
+        <div class="product-image">
+            <img src="{{ product.image_url }}" alt="Classic Cotton Tee">
+        </div>
+    </div>
+
+    <!-- Variants Section -->
+    <div class="variants-section">
+        <div class="section-header">
+            <h2 class="section-title">Product Variants</h2>
+            <div class="section-header-actions">
+                <button class="btn-add-size" onclick="openAddSizeModal()">
+                    <span>➕</span>
+                    <span>Add New Size</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="variants-table">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        <th>Stock</th>
+                        <th>Last Updated</th>
+                        <th>Stock Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not variants %}
+                            <tr>
+                                <td colspan="5" class="no-variants-message">
+                                    <div class="no-variants-container">
+                                        <p class="no-variants-text">
+                                            No variants have been added for this product yet.
+                                        </p>
+                                        <p class="no-variants-subtext">
+                                            To make this product available for listing, please add at least one size variant.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                    {% endif %}
+                    {% for variant in variants %}
+                    <tr>
+                        <td>{{ variant.size }}</td>
+                        <td>
+                            <div class="stock-control">
+                                <button class="stock-btn" onclick="updateStock('{{variant.id}}', -1)">−</button>
+                                <span class="stock-value" id="{{variant.id}}">{{ variant.stock }}</span>
+                                <!--modified - class for see changed one-->
+                                <button class="stock-btn" onclick="updateStock('{{variant.id}}', 1)">+</button>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="last-updated" id="last-updated-1">{{ variant.updated_at }}</span>
+                        </td>
+                        <td>
+                            {% if variant.stock >= 50 %}
+                            <span class="status-badge stock-status-available" id="stock-status-1">Available</span>
+                            {% elif variant.stock > 0 %}
+                            <span class="status-badge stock-status-low" id="stock-status-4">Low</span>
+                            {% else %}
+                            <span class="status-badge stock-status-out" id="stock-status-5">Out of Stock</span>
+                            {% endif %}
+
+
+                        </td>
+                        <td class="actions-cell">
+                            <button id="{{variant.id}}-submitBtn" class="btn-update" id="update-btn-1"
+                                onclick="submitStock('{{ variant.id }}', '{{ csrf_token }}')" disabled>
+                                <span>✓</span>
+                                <span>Update</span>
+                            </button>
+
+                            <button class="btn-remove" onclick="openRemoveModal('{{ variant.id }}')">
+                                <span>🗑️</span>
+                                <span>Empty</span>
+                            </button>
+
+                        </td>
+                    </tr>
+
+                    <!-- Remove Variant Confirmation Modal -->
+                    <div class="modal-overlay" id="removeModal{{ variant.id }}">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Remove Variant</h2>
+                            </div>
+                            <div class="modal-body">
+                                <p class="modal-message">Are you sure you want to remove all stocks of size {{ variant.size }} variant?</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-btn modal-btn-cancel" onclick="closeRemoveModal()">Cancel</button>
+                                <form action="{% url 'admin-delete-variant' variant.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_uuid" value="{{ product.uuid }}">
+                                    <button type="submit" class="modal-btn modal-btn-confirm">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</main>
+
+
+<!-- Add New Size Modal -->
+<div class="modal-overlay" id="addSizeModal">
+    <div class="modal">
+        <form action="{% url 'admin-manage-stocks' product.uuid %}" method="post">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Size</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-form-group">
+                    <label for="newSizeSelect">Select Size</label>
+                    <select name="size" id="newSizeSelect" required>
+                        <option value="" disabled selected>Select Size</option>
+                        {% for value, label in size_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="newStockAmount">Stock Amount</label>
+                    <input type="number" name="stock" id="newStockAmount" placeholder="Enter stock amount" min="0"
+                        required>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn modal-btn-cancel" onclick="closeAddSizeModal()">Cancel</button>
+                <button type="submit" class="modal-btn modal-btn-update">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    //for updating stock using ajax
+    url = "{% url 'admin-update-stock' %}"
+</script>
+<script src="{% static 'product/admin/js/manage_stocks.js' %}"></script>
+{% endblock %}

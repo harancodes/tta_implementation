@@ -1,0 +1,212 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'product/admin/css/list_categories.css' %}">
+<!--CSS for pagination-->
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Category Management</h1>
+        <div class="header-actions">
+            <button class="btn btn-add-style" onclick="addNewStyle()">+ Add New Style</button>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <form method="GET" id="searchForm" class="search-form">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search by style name" id="searchInput"
+                        value="{{ request.GET.search }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+                    <div class="search-actions">
+                        <a style="text-decoration: none;" href="{% url 'admin-category-management' %}?page={{request.GET.page}}">
+                            <button type="button" class="clear-btn" id="clearBtn" onclick="clearSearch()">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                                <span>Clear</span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Category Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Style ID</th>
+                    <th>Style Name</th>
+                    <th>Products</th>
+                    <th>Added Date</th>
+                    <th>Last Updated</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for style in page_obj %}
+                <tr>
+                    <td class="style-id">STY-{{ style.id|stringformat:'04d' }}</td>
+                    <td class="style-name">{{ style.name }}</td>
+                    <td class="added-date">{{ style.product_count }}</td>
+                    <td class="added-date">{{ style.created_at.date }}</td>
+                    <td class="added-date">{{ style.updated_at.date }}</td>
+                    <td>
+                        {% if style.is_deleted %}
+                        <span class="status-badge status-deleted">Deleted</span>
+                        {% else %}
+                        <span class="status-badge status-active">Active</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        {% if style.is_deleted %}
+                        <button class="btn-restore" onclick="openRestoreModal('{{style.id}}')">Restore</button>
+                        {% else %}
+                        <button class="btn-edit" onclick="editStyle('{{style.id}}')">Edit</button>
+                        <button class="btn-delete" onclick="openDeleteModal('{{style.id}}')">Delete</button>
+                        {% endif %}
+
+                    </td>
+                </tr>
+
+                <!-- Delete Confirmation Modal -->
+                <div class="modal-overlay" id="deleteModal{{style.id}}">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Delete Style Category</h2>
+                        </div>
+                        <div class="modal-body">
+                            <p class="modal-message">Are you sure you want to delete style category <strong
+                                    id="deleteStyleId">"{{ style.name }}"</strong>? This action cannot be undone and the
+                                category will be
+                                permanently
+                                removed.</p>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="modal-btn modal-btn-cancel"
+                                onclick="closeDeleteModal('{{style.id}}')">Cancel</button>
+                            <a href="{% url 'admin-delete-category' style.id %}">
+                                <button class="modal-btn modal-btn-confirm"
+                                    onclick="confirmDelete('{{style.id}}')">Delete</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restore Confirmation Modal -->
+                <div class="modal-overlay" id="restoreModal{{style.id}}">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Restore Style Category</h2>
+                        </div>
+                        <div class="modal-body">
+                            <p class="modal-message">Are you sure you want to restore style category <strong
+                                    id="restoreStyleId">{{style.name}}</strong>? The category will be set back to active
+                                status and
+                                will be visible
+                                again.</p>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="modal-btn modal-btn-cancel"
+                                onclick="closeRestoreModal('{{style.id}}')">Cancel</button>
+                            <a href="{% url 'admin-restore-category' style.id %}">
+                                <button class="modal-btn modal-btn-restore">Restore</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Category Modal -->
+                <div class="modal-overlay" id="editCategoryModal{{style.id}}">
+                    <div class="modal">
+                        <form action="{% url 'admin-edit-category' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="_method" value="PUT">
+                            
+                            <div class="modal-header">
+                                <h2 class="modal-title">Edit Style Category</h2>
+                            </div>
+                            <div class="modal-body">
+                                <div class="modal-form-group">
+                                    <label class="modal-form-label" for="editCategoryName">Style Category Name</label>
+                                    <input type="text" name="style_name" class="modal-form-input"
+                                        id="editCategoryName{{style.id}}" placeholder="Enter style category name"
+                                        autocomplete="off" value="{{style.name}}">
+                                    <input type="hidden" name="style_id" value="{{ style.id }}" id="">
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="modal-btn modal-btn-cancel"
+                                    onclick="closeEditCategoryModal('{{style.id}}')">Cancel</button>
+                                <button type="submit" class="modal-btn modal-btn-update">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+        
+    </div>
+</main>
+
+<!-- Add Category Modal -->
+<div class="modal-overlay" id="addCategoryModal">
+    <div class="modal">
+        <form action="{% url 'admin-add-style' %}" method="post">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Style Category</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-form-group">
+                    <label class="modal-form-label" for="addCategoryName">Style Category Name</label>
+                    <input type="text" name="style_name" class="modal-form-input" id="addCategoryName"
+                        placeholder="Enter style category name" autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn modal-btn-cancel"
+                    onclick="closeAddCategoryModal()">Cancel</button>
+                <button type="submit" class="modal-btn modal-btn-add">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'product/admin/js/list_categories.js' %}"></script>
+{% endblock %}

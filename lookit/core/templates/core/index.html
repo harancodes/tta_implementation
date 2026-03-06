@@ -1,0 +1,171 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'core/css/index.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Express Yourself with Lookit</h1>
+        <p>Discover unique designs & high-quality t-shirts that reflect your style.</p>
+        <a href="{% url 'explore' %}">
+            <button class="shop-now-btn">Shop Now</button>
+        </a>
+    </div>
+</section>
+
+<!-- Featured T-Shirts -->
+<section class="section">
+    <h2 class="section-title">Featured T-Shirts</h2>
+    <div class="product-grid">
+
+        {% for product in featured %}
+        <a style="text-decoration: none;" href="{% url 'product-details' product.uuid %}">
+            <div class="product-card">
+                <!-- <div class="product-image" style="background: linear-gradient(135deg, #f5e6d3, #e8d5c0);"></div> -->
+                {% if product.offer_price and product.offer_price != product.price %}
+                    <span class="discount-badge subtle">
+                        -{{ product.offer_percentage }}%
+                    </span>
+                {% endif %}
+                <img class="product-image" src="{{ product.image_url }}" alt="">
+                <div class="product-info">
+                    <h3 class="product-title">{{ product.name }}</h3>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-price">
+                        <div class="price-stack">
+                                {% if product.offer_price and product.offer_price != product.price %}
+                                    <span class="price-current">₹{{ product.offer_price }}</span>
+                                    <span class="price-old">₹{{ product.price }}</span>
+                                {% else %}
+                                    <span class="price-current">₹{{ product.price }}</span>
+                                {% endif %}
+                        </div>
+                        {% if request.user.is_authenticated %}
+                        <!--show toggle wishlist add/remove btn only for logined users-->
+                        <button class="wishlist-btn {% if product.in_wishlist %}active{% endif %}" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+                            <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                                    2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                                    C13.09 3.81 14.76 3 16.5 3
+                                    19.58 3 22 5.42 22 8.5
+                                    c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="section">
+    <h2 class="section-title">New Arrivals</h2>
+    <div class="product-grid">
+
+        {% for product in new_arrivals %}
+        <a style="text-decoration: none;" href="{% url 'product-details' product.uuid %}">
+            <div class="product-card">
+                {% if product.offer_price and product.offer_price != product.price %}
+                    <span class="discount-badge subtle">
+                        -{{ product.offer_percentage }}%
+                    </span>
+                {% endif %}
+                {% if product.image_url != ' ' %}
+                <img class="product-image" src="{{ product.image_url }}" alt="">
+                {% else %}
+                <div class="product-image" style="background: linear-gradient(135deg, #e8e8e8, #d5d5d5);"></div>
+                {% endif %}
+
+                <div class="product-info">
+                    <h3 class="product-title">{{ product.name }}</h3>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-price">
+                        <div class="price-stack">
+                                {% if product.offer_price and product.offer_price != product.price %}
+                                    <span class="price-current">₹{{ product.offer_price }}</span>
+                                    <span class="price-old">₹{{ product.price }}</span>
+                                {% else %}
+                                    <span class="price-current">₹{{ product.price }}</span>
+                                {% endif %}
+                        </div>
+                        {% if request.user.is_authenticated %}
+                        <!--show toggle wishlist add/remove btn only for logined users-->
+                        <button class="wishlist-btn {% if product.in_wishlist %}active{% endif %}" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+                            <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                                    2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                                    C13.09 3.81 14.76 3 16.5 3
+                                    19.58 3 22 5.42 22 8.5
+                                    c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+
+
+    </div>
+</section>
+
+<!-- Customer Testimonials -->
+<!-- <section class="section">
+    <h2 class="section-title">Customer Testimonials</h2>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">SC</div>
+                <div class="testimonial-info">
+                    <h4>Sophia Carter</h4>
+                    <p>2 months ago</p>
+                </div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <p class="testimonial-text">I love the quality and design of my new t-shirt! It's so comfortable and I get
+                compliments all the time.</p>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">EM</div>
+                <div class="testimonial-info">
+                    <h4>Ethan Mitchell</h4>
+                    <p>3 months ago</p>
+                </div>
+            </div>
+            <div class="stars">★★★★☆</div>
+            <p class="testimonial-text">Great t-shirt, the print is really nice. The fit is a bit snug, but overall I'm
+                happy with my purchase.</p>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">OB</div>
+                <div class="testimonial-info">
+                    <h4>Olivia Bennett</h4>
+                    <p>4 months ago</p>
+                </div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <p class="testimonial-text">The t-shirt is amazing! The fabric is soft and the design is exactly what I
+                wanted. Will definitely buy more.</p>
+        </div>
+    </div>
+</section> -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+    toggle_wishlist_url = "{% url 'toggle-wishlist-item' %}"
+</script>
+<script src="{% static 'core/js/index.js' %}"></script>
+{% endblock %}

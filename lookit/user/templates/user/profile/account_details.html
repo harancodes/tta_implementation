@@ -1,0 +1,102 @@
+
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'user/css/profile_container.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/account/account_details.css' %}">
+<!--CSS for profile sidebar-->
+<link rel="stylesheet" href="{% static 'user/css/components/profile_sidebar.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<!-- Main Content -->
+<div class="profile-container">
+
+    <!-- Sidebar -->
+    {% include 'user_base/components/profile_sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between;">
+        <h1 class="page-title">My Account</h1>
+        <a style="text-decoration: none;" href="{% url 'edit-profile' %}">
+            <button class="edit-profile-btn">Edit Profile</button>
+        </a>
+        </div>
+        <div class="user-summary">
+            {% if user.profile_img_url %}
+            <img src="{{ user.profile_img_url }}" alt="User Avatar" class="user-avatar"
+            onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709699.png'">
+            {% else %}
+            <img src="https://cdn-icons-png.flaticon.com/512/709/709699.png" alt="User Avatar" class="user-avatar">
+            {% endif %}
+            
+            <div class="user-info">
+                <h3>{{ user.full_name }}</h3>
+                <p>{{ user.email }}</p>
+            </div>
+        </div>
+
+        <div class="account-details-section">
+            <h2 class="section-heading">Account Details</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Name</span>
+                    <span class="detail-value">{{ user.full_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ user.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Gender</span>
+                    <span class="detail-value">{% if user.gender %}{{ user.gender }}{% else %} - {% endif %}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{% if user.phone %}{{ user.phone }}{% else %} - {% endif %}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Date of Birth</span>
+                    <span class="detail-value">{% if user.dob %}{{ user.dob }}{% else %} - {% endif %}</span>
+                </div>
+                <!-- <div class="detail-item">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value">Maximus house, Alberquique, Walter Street</span>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="referral-section">
+            <h2 class="section-heading">Referral Program</h2>
+            <div class="referral-code-container">
+                <div class="referral-code">{{ user.referral_code }}</div>
+                <div class="referral-actions">
+                    <button class="action-icon-btn" title="Copy">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                    <button class="action-icon-btn" title="Share">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p class="referral-description">Share this code and both of you will get ₹100 in your wallet!</p>
+        </div>
+
+        
+    </main>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'user/js/account/account_details.js' %}"></script>
+{% endblock %}
+

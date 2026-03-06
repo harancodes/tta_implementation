@@ -1,0 +1,107 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'staff/user/css/view_staff.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-user' %}">User Management</a>
+        <span>/</span>
+        <span>Staff Details</span>
+    </div>
+
+    <!-- Staff Header -->
+    <div class="staff-header">
+        <div class="staff-avatar">👤</div>
+        <div class="staff-info">
+            <h1 class="staff-name">{{ staff.full_name }}</h1>
+            <div class="badges-container">
+                <span class="status-badge">Active</span>
+                <span class="role-badge">Staff</span>
+            </div>
+            <div class="staff-details">
+                <div class="staff-detail-item">
+                    <span class="staff-detail-label">Email:</span>
+                    <span class="staff-detail-value">ava.harper@email.com</span>
+                </div>
+                <div class="staff-detail-item">
+                    <span class="staff-detail-label">Phone:</span>
+                    <span class="staff-detail-value">(555) 876-5432</span>
+                </div>
+                <div class="staff-detail-item">
+                    <span class="staff-detail-label">Joined Date:</span>
+                    <span class="staff-detail-value">2024-01-10</span>
+                </div>
+                <div class="staff-detail-item">
+                    <span class="staff-detail-label">Last Login:</span>
+                    <span class="staff-detail-value">May 20, 2024</span>
+                </div>
+            </div>
+            <div class="staff-actions">
+                <button class="btn btn-demote" onclick="demoteToUser()">Demote to User</button>
+                <button class="btn btn-block" onclick="blockStaff()">Block Staff</button>
+                <button class="btn btn-delete" onclick="deleteStaff()">Delete Staff</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Demote to User Confirmation Modal -->
+<div class="modal-overlay" id="demoteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Demote to User</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to demote this staff member to user? They will lose all
+                administrative privileges and access to the admin panel.</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDemoteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-demote" onclick="confirmDemoteToUser()">Demote to User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Block Staff Confirmation Modal -->
+<div class="modal-overlay" id="blockModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Block Staff</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to block this staff member? They will no longer be able to
+                access the admin panel.</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeBlockModal()">Cancel</button>
+                <button class="modal-btn modal-btn-block" onclick="confirmBlockStaff()">Block Staff</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Staff Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Delete Staff</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to delete this staff member? This action cannot be undone and
+                all their data will be permanently removed.</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmDeleteStaff()">Delete Staff</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'staff/user/js/view_staff.js' %}"></script>
+{% endblock %}

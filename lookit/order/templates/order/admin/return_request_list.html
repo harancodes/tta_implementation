@@ -1,0 +1,197 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/admin/return_request_list.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Order Returns</h1>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'admin-list-return-requests' %}" id="searchForm" class="search-form">
+
+
+            <!--to preserve filter query params-->
+            {% if request.GET.date_range %}
+            <input type="hidden" name="date_range" value="{{ request.GET.date_range }}">
+            {% endif %}
+            {% if request.GET.payment_method %}
+            <input type="hidden" name="payment_method" value="{{ request.GET.payment_method }}">
+            {% endif %}
+            {% if request.GET.payment_status %}
+            <input type="hidden" name="payment_status" value="{{ request.GET.payment_status }}">
+            {% endif %}
+            {% if request.GET.order_status %}
+            <input type="hidden" name="order_status" value="{{ request.GET.order_status }}">
+            {% endif %}
+
+
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search Returns By ID, Product Name, Customer Name.." id="searchInput"
+                        value="{{ request.GET.search }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+
+                    <!--search field clear button-->
+                    <div class="search-actions">
+                        <a href="{% url 'admin-list-return-requests' %}??{% for key, value in request.GET.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">
+                            <button type="button" class="clear-btn" id="clearBtn">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()">
+                    <span class="filter-icon"></span>
+                    <span>Filters</span>
+                </button>
+            </div>
+        </form>
+        <!-- Filters Form -->
+        <form method="GET" action="" id="filterForm" class="filter-form">
+            {% if request.GET.search %}
+            <input type="hidden" value="{{ request.GET.search }}" name="search">
+            {% endif %}
+            <div class="filters-container {% if request.GET.date_range or request.GET.return_status %}show{% endif %}" id="filtersContainer">
+                <div class="filters-row">
+
+                    <div class="filter-group">
+                        <select name="date_range" id="categorySelect" class="filter-select">
+                            <option value="">Date Range</option>
+                            <option value="today" {% if request.GET.date_range == 'today' %}selected {% endif %}>Today</option>
+                            <option value="week" {% if request.GET.date_range == 'week' %}selected {% endif %}>This Week
+                            </option>
+                            <option value="month" {% if request.GET.date_range == 'month' %}selected {% endif %}>This Month
+                            </option>
+                            <option value="year" {% if request.GET.date_range == 'year' %}selected {% endif %}>This Year
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="return_status" id="returnStatusSelect" class="filter-select">
+                            <option value="">Return Status</option>
+
+                            <option value="REQUESTED"
+                                {% if request.GET.return_status == 'REQUESTED' %}selected{% endif %}>
+                                Requested
+                            </option>
+
+                            <option value="APPROVED"
+                                {% if request.GET.return_status == 'APPROVED' %}selected{% endif %}>
+                                Approved
+                            </option>
+
+                            <option value="REJECTED"
+                                {% if request.GET.return_status == 'REJECTED' %}selected{% endif %}>
+                                Rejected
+                            </option>
+
+                            <option value="PICKUP_SCHEDULED"
+                                {% if request.GET.return_status == 'PICKUP_SCHEDULED' %}selected{% endif %}>
+                                Pickup Scheduled
+                            </option>
+
+                            <option value="PICKED_UP"
+                                {% if request.GET.return_status == 'PICKED_UP' %}selected{% endif %}>
+                                Picked Up
+                            </option>
+
+                            <option value="REFUNDED"
+                                {% if request.GET.return_status == 'REFUNDED' %}selected{% endif %}>
+                                Refund Completed
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-apply" id="applyFiltersBtn">Apply Filters</button>
+                    <a href="{% url 'admin-list-return-requests' %}">
+                        <button type="button" class="btn btn-reset" id="resetFiltersBtn">Rest Filters</button>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Product Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Return ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Refund Amount</th>
+                    <th>Reason For Return</th>
+                    <th>Return Status</th>
+                    <th>Requested Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for return_request in page_obj %}
+                <tr>
+                    <td class="return-id">{{ return_request.uuid }}</td>
+                    <td class="customer-name">
+                        {{ return_request.order.user.full_name }}
+                    </td>
+                    <td class="product-name">{{ return_request.product.name }}</td>
+                    <td class="return-amount " >₹{{ return_request.amount_paid }}</td>
+                    <td class="return-reason">{{ return_request.reason }}</td>
+                    <td>
+                        <span class="status-badge status-{{ return_request.status|lower|slugify }}">
+                            {{ return_request.status }}
+                        </span>
+                    </td>
+                    <td class="return-date">{{ return_request.request_date.date }}</td>
+                    <td>
+                        <a href="{% url 'admin-return-details' return_request.uuid %}">
+                            <button class="btn-view">Manage</button>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'order/js/admin/return_request_list.js' %}"></script>
+{% endblock %}

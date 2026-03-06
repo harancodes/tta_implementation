@@ -1,0 +1,386 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'product/user/css/explore.css' %}">
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<div class="main-container">
+    <!-- Filter Sidebar -->
+    <aside class="filter-sidebar">
+        <h2 class="filter-title">Filter By</h2>
+
+        <!--FILTER FORM DESKTOP (there is a seperate form for mobile devices)-->
+        <form action="{% url 'explore' %}" method="get" id="filterForm">
+
+            <!--for preserving query params of search and sort-->
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+            <input type="hidden" name="sort_name" value="{{ request.GET.sort_name }}">
+            <input type="hidden" name="sort_price" value="{{ request.GET.sort_price }}">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
+
+            <!-- Category Filter -->
+            <div class="filter-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="men" {% if request.GET.category == 'men' %}selected{% endif %}>Men</option>
+                        <option value="women" {% if request.GET.category == 'women' %}selected{% endif %}>Women</option>
+                        <option value="kids" {% if request.GET.category == 'kids' %}selected{% endif %}>Kids</option>
+                    </select>
+            </div>
+
+            <!-- Styles Filter -->
+            <div class="filter-group">
+                <label for="styles">Styles</label>
+                <div class="searchable-dropdown" id="stylesDropdown">
+                    <input type="text" class="searchable-dropdown-input" id="stylesInput" placeholder="All Styles"
+                        value="{{ request.GET.style }}" readonly>
+                    <input type="hidden" id="stylesValue" name="style" value="{{ request.GET.style }}">
+                    <svg class="searchable-dropdown-arrow" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#333" d="M6 9L1 4h10z" />
+                    </svg>
+                    <div class="searchable-dropdown-options">
+                        <div class="searchable-dropdown-search">
+                            <input type="text" placeholder="Search styles..." id="stylesSearch">
+                        </div>
+                        <div class="searchable-dropdown-option" data-value="" data-text="All Styles">All Styles</div>
+                        {% for style in styles %}
+                        <div class="searchable-dropdown-option" data-value="{{ style.name }}" data-text="{{ style.name }}">{{ style.name }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Filter -->
+            <div class="filter-group">
+                <label for="color">Color</label>
+                <select id="color" name="color" class="filter-select">
+                    <option value="">All Colors</option>
+                    {% for value, label in color_choices %}
+                    <option value="{{ value }}" {% if request.GET.color == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Size Filter -->
+            <div class="filter-group">
+                <label for="size">Size</label>
+                <select id="size" name="size" class="filter-select">
+                    <option value="">All Sizes</option>
+                    {% for value, label in size_choices %}
+                    <option value="{{ value }}" {% if request.GET.size == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Price Range Filter -->
+            <div class="filter-group">
+                <label for="priceRange">Price Range</label>
+                <div class="price-range-container">
+                    <div class="price-range-wrapper">
+                        <div class="price-range-active" id="priceRangeActive"></div>
+                        <input type="range" id="priceRangeMin" name="price_min"
+                            class="price-range-slider price-range-slider-min" min="0" max="5000" value="{%if request.GET.price_min %}{{ request.GET.price_min }}{% else %}0{% endif %}" step="100">
+                        <input type="range" id="priceRangeMax" name="price_max"
+                            class="price-range-slider price-range-slider-max" min="0" max="5000" value="{%if request.GET.price_max %}{{ request.GET.price_max }}{% else %}5000{% endif %}"
+                            step="100">
+                    </div>
+                    <div class="price-display">
+                        <span id="priceMinDisplay">₹{{ request.GET.price_min }}</span>
+                        <span id="priceMaxDisplay">₹{{ request.GET.price_max }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <a href="{% url 'explore' %}?category={{ request.GET.category }}">
+                    <button type="button" class="clear-btn">Clear All</button>
+                </a>
+                <button type="submit" class="apply-btn">Apply Filters</button>
+            </div>
+
+        </form>
+
+    </aside>
+
+    <!-- Product Content Area -->
+    <main class="product-content">
+        <div class="content-header">
+            <h1 class="content-title">
+                Explore our collection
+                <span class="title-badge">{{ request.GET.category|default:'All' }}</span>
+            </h1>
+
+            <!--SEARCH SECTION-->
+            <div class="search-container">
+                <form method="GET" action="{% url 'explore' %}" id="searchForm">
+
+                    <!-- hidden inputs to preserve other query params -->
+                     <input type="hidden" name="category" value="{{ request.GET.category }}">
+                    <input type="hidden" name="sort_price" value="{{ request.GET.sort_price }}">
+                    <input type="hidden" name="sort_name" value="{{ request.GET.sort_name }}">
+                    <input type="hidden" name="style" value="{{ request.GET.style }}">
+                    <input type="hidden" name="color" value="{{ request.GET.color }}">
+                    <input type="hidden" name="size" value="{{ request.GET.size }}">
+                    <input type="hidden" name="priceMin" value="{{ request.GET.priceMin }}">
+                    <input type="hidden" name="priceMax" value="{{ request.GET.priceMax }}">
+
+                    <input type="text" placeholder="Search" id="searchInput" name="search"
+                        value="{{ request.GET.search }}">
+                    <!--clear button-->
+                    <a
+                        href="{% url 'explore' %}?sort_price={{ request.GET.sort_price }}&sort_name={{ request.GET.sort_name }}&styles={{ request.GET.style }}&color={{ request.GET.color }}&size={{ request.GET.size }}&priceMin={{ request.GET.priceMin }}&priceMax={{ request.GET.priceMax }}">
+                        <button type="button" class="search-clear-btn {% if request.GET.search %}visible{% endif %}"
+                            id="searchClearBtn" title="Clear">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            </svg>
+                        </button>
+                    </a>
+                    <!--submit button-->
+                    <button type="submit" class="search-submit-btn" title="Search">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Sort Buttons -->
+        <div class="sort-container">
+            <div class="sort-group">
+                <span class="sort-label" style="font-size: 0.85rem;">Price:</span>
+                <a
+                    href="{% url 'explore' %}?category={{ request.GET.category }}&sort_price=price&sort_name={{ request.GET.sort_name }}&search={{ request.GET.search }}&styles={{ request.GET.style }}&color={{ request.GET.color }}&size={{ request.GET.size }}&priceMin={{ request.GET.priceMin }}&priceMax={{ request.GET.priceMax }}">
+                    <button class="sort-btn {% if request.GET.sort_price == 'price' %}active{% endif %}">Low to High</button>
+                </a>
+                <a
+                    href="{% url 'explore' %}?category={{ request.GET.category }}&sort_price=-price&sort_name={{ request.GET.sort_name }}&search={{ request.GET.search }}&styles={{ request.GET.style }}&color={{ request.GET.color }}&size={{ request.GET.size }}&priceMin={{ request.GET.priceMin }}&priceMax={{ request.GET.priceMax }}">
+                    <button class="sort-btn {% if request.GET.sort_price == '-price' %}active{% endif %}">High to Low</button>
+                </a>
+            </div>
+            <div class="sort-group">
+                <span class="sort-label" style="font-size: 0.85rem;">Name:</span>
+                <a
+                    href="{% url 'explore' %}?category={{ request.GET.category }}&sort_name=name&sort_price={{ request.GET.sort_price }}&search={{ request.GET.search }}&styles={{ request.GET.style }}&color={{ request.GET.color }}&size={{ request.GET.size }}&priceMin={{ request.GET.priceMin }}&priceMax={{ request.GET.priceMax }}">
+                    <button class="sort-btn {% if request.GET.sort_name == 'name' %}active{% endif %}">A-Z</button>
+                </a>
+                <a
+                    href="{% url 'explore' %}?category={{ request.GET.category }}&sort_name=-name&sort_price={{ request.GET.sort_price }}&search={{ request.GET.search }}&styles={{ request.GET.style }}&color={{ request.GET.color }}&size={{ request.GET.size }}&priceMin={{ request.GET.priceMin }}&priceMax={{ request.GET.priceMax }}">
+                    <button class="sort-btn {% if request.GET.sort_name == '-name' %}active{% endif %}">Z-A</button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile Filter Toggle Button -->
+        <button class="filter-toggle-btn" id="filterToggleBtn">
+            <span>Filter By</span>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </button>
+
+
+        <!-- Filter Sidebar (Mobile - appears after toggle) -->
+        <aside class="filter-sidebar {% if request.GET.style or request.GET.color or request.GET.size or request.GET.price_min and request.GET.price_min != '0' or request.GET.price_max and request.GET.price_max != '5000' %} expanded {% endif %}" id="mobileFilterSidebar">
+            <h2 class="filter-title">Filter By</h2>
+
+            <form action="{% url 'explore' %}" method="get" id="mobileFilterForm">
+
+                <!-- hidden inputs to preserve other query params -->
+                <input type="hidden" name="category" value="{{ request.GET.category }}">
+                <input type="hidden" name="sort_price" value="{{ request.GET.sort_price }}">
+                <input type="hidden" name="sort_name" value="{{ request.GET.sort_name }}">
+                <input type="hidden" name="search" value="{{ request.GET.search }}">
+
+                <!-- Category Filter -->
+                <div class="filter-group">
+                    <label for="categoryMobile">Category</label>
+                    <select id="categoryMobile" name="category" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="men" {% if request.GET.category == 'men' %}selected{% endif %}>Men</option>
+                        <option value="women" {% if request.GET.category == 'women' %}selected{% endif %}>Women</option>
+                        <option value="kids" {% if request.GET.category == 'kids' %}selected{% endif %}>Kids</option>
+                    </select>
+                </div>
+
+                <!-- Styles Filter -->
+                <div class="filter-group">
+                    <label for="styles">Styles</label>
+                    <div class="searchable-dropdown" id="stylesDropdownMobile">
+                        <input type="text" class="searchable-dropdown-input" id="stylesInputMobile"
+                            placeholder="All Styles" value="{{ request.GET.style }}" readonly>
+                        <input type="hidden" id="stylesValueMobile" name="style" value="{{ request.GET.style }}">
+                        <svg class="searchable-dropdown-arrow" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#333" d="M6 9L1 4h10z" />
+                        </svg>
+                        <div class="searchable-dropdown-options">
+                            <div class="searchable-dropdown-search">
+                                <input type="text" placeholder="Search styles..." id="stylesSearchMobile">
+                            </div>
+                            <div class="searchable-dropdown-option" data-value="" data-text="All Styles">All Styles</div>
+                            {% for style in styles %}
+                            <div class="searchable-dropdown-option" data-value="{{ style.name }}" data-text="{{ style.name }}">
+                                {{ style.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Filter -->
+                <div class="filter-group">
+                    <label for="color">Color</label>
+                    <select id="color" name="color" class="filter-select">
+                        <option value="">All Colors</option>
+                        {% for value, label in color_choices %}
+                        <option value="{{ value }}" {% if request.GET.color == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Size Filter -->
+                <div class="filter-group">
+                    <label for="size">Size</label>
+                    <select id="size" name="size" class="filter-select">
+                        <option value="">All Sizes</option>
+                        {% for value, label in size_choices %}
+                        <option value="{{ value }}" {% if request.GET.size == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Price Range Filter -->
+                <div class="filter-group">
+                    <label for="priceRange">Price Range</label>
+                    <div class="price-range-container">
+                        <div class="price-range-wrapper">
+                            <div class="price-range-active" id="priceRangeActiveMobile"></div>
+                            <input type="range" id="priceRangeMinMobile" name="price_min"
+                                class="price-range-slider price-range-slider-min" min="0" max="5000"
+                                value="{% if request.GET.price_min %}{{ request.GET.price_min }}{% else %}0{% endif %}" step="100">
+                            <input type="range" id="priceRangeMaxMobile" name="price_max"
+                                class="price-range-slider price-range-slider-max" min="0" max="5000"
+                                value="{% if request.GET.price_max %}{{ request.GET.price_max }}{% else %}5000{% endif %}" step="100">
+                        </div>
+                        <div class="price-display">
+                            <span id="priceMinDisplayMobile">₹{{ request.GET.price_min|default:'0' }}</span>
+                            <span id="priceMaxDisplayMobile">₹{{ request.GET.price_max|default:'5000' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="filter-buttons">
+                    <a href="{% url 'explore' %}?category={{ request.GET.category }}">
+                        <button type="button" class="clear-btn">Clear All</button>
+                    </a>
+                    <button type="submit" class="apply-btn">Apply Filters</button>
+                </div>
+            </form>
+        </aside>
+
+
+        <div class="product-grid">
+
+            {% for product in page_obj %}
+            <a style="text-decoration: none;" href="{% url 'product-details' product.uuid %}">
+            <div class="product-card">
+            {% if product.offer_price and product.offer_price != product.price %}
+                    <span class="discount-badge subtle">
+                        -{{ product.offer_percentage }}%
+                    </span>
+            {% endif %}
+            {% if product.image_url != ' ' %}
+                    <img class="product-image" src="{{ product.image_url }}" alt="{{ product.name }}">
+                    
+                    {% else %}
+                    <div class="product-image" style="background: linear-gradient(135deg, #f5e6d3, #e8d5c0);"></div>
+            {% endif %}
+
+                <div class="product-info">
+                    <h3 class="product-title">{{ product.name }}</h3>
+                        <div class="product-price">
+                            <div class="price-stack">
+                                {% if product.offer_price and product.offer_price != product.price %}
+                                    <span class="price-current">₹{{ product.offer_price }}</span>
+                                    <span class="price-old">₹{{ product.price }}</span>
+                                {% else %}
+                                    <span class="price-current">₹{{ product.price }}</span>
+                                {% endif %}
+                            </div>
+
+                            {% if request.user.is_authenticated %}
+                            <!--show toggle wishlist add/remove btn only for logined users-->
+                            <button class="wishlist-btn {% if product.in_wishlist %}active{% endif %}" data-product-id="{{ product.id }}" onclick="toggleWishlist(event, this)">
+                                <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                                        2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                                        C13.09 3.81 14.76 3 16.5 3
+                                        19.58 3 22 5.42 22 8.5
+                                        c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+
+                </div>
+            </div>
+            </a>
+            
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-illustration">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#ddd"/>
+                        <circle cx="12" cy="8" r="6" fill="white"/>
+                        <circle cx="9" cy="7" r="1" fill="#999"/>
+                        <circle cx="15" cy="7" r="1" fill="#999"/>
+                        <path d="M8 11c.5 1 1.5 2 4 2s3.5-1 4-2" stroke="#999" stroke-width="1.5" fill="none"/>
+                    </svg>
+                    <div class="empty-hanger">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 10 C40 10, 40 20, 50 20 C60 20, 60 10, 50 10 M50 20 L50 30 L20 60 L80 60 L50 30 L50 20" fill="none" stroke="#B55E8A" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="empty-title">No products found</h3>
+                <p class="empty-message">
+                    {% if request.GET|length > 1 %}
+                        Try adjusting your filters or search term — we might have something perfect hiding!
+                    {% else %}
+                        Looks like we're fresh out of stock right now. Check back soon for new arrivals!
+                    {% endif %}
+                </p>
+                <a href="{% url 'explore' %}">
+                    <button class="empty-clear-btn">Clear all filters</button>
+                </a>
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- Pagination -->
+        {% include 'admin_base/components/pagination.html' %}
+
+    </main>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    toggle_wishlist_url = "{% url 'toggle-wishlist-item' %}"
+</script>
+<script src="{% static 'product/user/js/explore.js' %}"></script>
+{% endblock %}

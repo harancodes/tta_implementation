@@ -1,0 +1,195 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'offer/css/list.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/components/table_empty_state.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Offer Management</h1>
+                <div class="header-actions">
+            <a href="{% url 'admin-add-offer' %}">
+                <button class="btn btn-add-style">+ Create Offer</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'admin-list-offers' %}" id="searchForm" class="search-form">
+
+            {% if request.GET.status %}
+            <input type="hidden" name="status" value="{{ request.GET.status }}">
+            {% endif %}
+            {% if request.GET.scope %}
+            <input type="hidden" name="scope" value="{{ request.GET.scope }}">
+            {% endif %}
+
+            <div class="search-container">
+
+                <div class="search-bar">
+                    <input type="text" name="search" id="searchInput" placeholder="Search by Offer Name..."
+                        value="{{ request.GET.search }}">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </span>
+
+                    <div class="search-actions">
+                        <a href="{% url 'admin-list-offers' %}?{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}{% if request.GET.scope %}scope={{ request.GET.scope }}{% endif %}">
+                            <button type="button" class="clear-btn" id="clearBtn">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <button type="submit" class="search-btn">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>Search</span>
+                </button>
+
+                <button type="button" class="filter-toggle-btn" onclick="toggleFilters()">
+                    <span class="filter-icon"></span>
+                    <span>Filters</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Filters -->
+        <form method="GET" action="" class="filter-form">
+            {% if request.GET.search %}
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
+            {% endif %}
+
+            <div id="filtersContainer" class="filters-container {% if request.GET.status or request.GET.scope %}show{% endif %}">
+                <div class="filters-row">
+
+                    <div class="filter-group">
+                        <select name="scope" class="filter-select">
+                            <option value="">Offer Scope</option>
+                            <option value="PRODUCT_BASED" {% if request.GET.scope == 'PRODUCT_BASED' %}selected{% endif %}>Product Based</option>
+                            <option value="CATEGORY_BASED" {% if request.GET.scope == 'CATEGORY_BASED' %}selected{% endif %}>Category Based</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="status" class="filter-select">
+                            <option value="">Offer Status</option>
+                            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="upcoming" {% if request.GET.status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                            <option value="ended" {% if request.GET.status == 'ended' %}selected{% endif %}>Ended</option>
+                            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-apply">Apply Filters</button>
+                    <a href="{% url 'admin-list-offers' %}">
+                        <button type="button" class="btn btn-reset">Reset Filters</button>
+                    </a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Coupon Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Offer Title</th>
+                    <th>Scope</th>
+                    <th>Target</th>
+                    <th>Discount</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            <!-- Dummy filled row for layout preview -->
+             {% for offer in page_obj %}
+                <tr>
+                    <td class="col-id">
+                        {{ offer.name }}
+                    </td>
+                            <!-- 🆕 Offer Scope Column -->
+                    <td class="offer-scope">
+                        {% if offer.scope == 'CATEGORY_BASED' %}
+                            <span class="offer-scope-badge category">
+                                <svg viewBox="0 0 24 24" class="badge-icon" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                                    <circle cx="8" cy="6" r="1"></circle>
+                                    <circle cx="8" cy="12" r="1"></circle>
+                                    <circle cx="8" cy="18" r="1"></circle>
+                                </svg>
+                                Category
+                            </span>
+                        {% else %}
+                            <!-- 🆕 Offer Scope Column -->
+                            <span class="offer-scope-badge product">
+                                <svg viewBox="0 0 24 24" class="badge-icon" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 7h18M3 7l1.8 11.5a2 2 0 0 0 2 1.5h10.4a2 2 0 0 0 2-1.5L21 7"></path>
+                                    <path d="M16 11a4 4 0 1 1-8 0"></path>
+                                </svg>
+                                Product
+                            </span>
+                        {% endif %}
+                    </td>
+                    {% if offer.scope == 'CATEGORY_BASED' %}
+                    <td class="col-amount">{{ offer.style.name }}</td>
+                    {% else %}
+                    <td class="col-amount">{{ offer.product_count }} Products</td>
+                    {% endif %}
+                    
+                    <td class="col-amount">{{ offer.discount }}%</td>
+                    <td class="col-date">{{ offer.start_date|date:'d M Y' }}</td>
+                    <td class="col-date">{{ offer.end_date|date:'d M Y' }}</td>
+
+                    <td>
+                        <span class="coupon-status-badge status-{{ offer.status }}">{{ offer.status }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin-edit-offer' offer.uuid %}">
+                            <button class="coupon-btn-view">Edit</button>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'admin_base/components/table_empty_state.html' %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% include 'admin_base/components/pagination.html' %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'coupon/js/admin/list.js' %}"></script>
+{% endblock %}

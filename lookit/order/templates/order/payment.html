@@ -1,0 +1,275 @@
+{% extends 'user_base/base.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'order/css/payment.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<!--main content-->
+<div class="container">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'cart' %}">Shopping Cart</a>
+        <span>/</span>
+        <a href="{% url 'checkout' %}">Checkout</a>
+        <span>/</span>
+        <span class="active">Payment</span>
+    </div>
+
+    <div class="payment-layout">
+        <!-- Payment Methods -->
+        <div class="payment-methods">
+            <h2>Payment Method</h2>
+            
+            <div class="payment-tabs">
+                <div class="tab active" onclick="showTab('upi')">Online Payment</div>
+                <!-- <div class="tab " onclick="showTab('debit-card')">Debit Card</div> -->
+                <div class="tab" onclick="showTab('cod')">Cash on Delivery</div>
+                <div class="tab" onclick="showTab('wallet')">Wallet</div>
+            </div>
+            
+            <!-- Online Payment Payment -->
+            <!-- Online Payment -->
+            <div id="upi" class="tab-content active">
+
+                <!-- Info Banner -->
+                <div class="online-banner">
+                    <div class="secure-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>100% Secure Payments</span>
+                    </div>
+                    <p class="online-desc">
+                        Pay instantly using UPI, debit/credit cards, or net banking through our encrypted payment gateway.
+                        Your transaction is processed safely in real time.
+                    </p>
+                </div>
+
+                <!-- Supported Methods -->
+                <div class="payment-supported">
+                    <h4>We Accept</h4>
+                    <div class="payment-icons">
+                        <span><i class="fab fa-google-pay"></i> GPay</span>
+                        <span><i class="fab fa-cc-visa"></i> Visa</span>
+                        <span><i class="fab fa-cc-mastercard"></i> MasterCard</span>
+                        <span><i class="fas fa-university"></i> Net Banking</span>
+                        <span><i class="fas fa-qrcode"></i> UPI</span>
+                    </div>
+                </div>
+
+                <!-- Trust Points -->
+                <ul class="payment-trust-points">
+                    <li><i class="fas fa-bolt"></i> Instant confirmation</li>
+                    <li><i class="fas fa-shield-alt"></i> Bank-grade encryption</li>
+                    <li><i class="fas fa-undo"></i> Easy refunds on failed payments</li>
+                </ul>
+
+                <!-- CTA -->
+                <button onclick="createPaymentAjax()" class="btn-pay online-pay-btn">
+                    <i class="fas fa-credit-card"></i> Pay ₹{{ order.grand_total }} Securely
+                </button>
+
+            </div>
+  
+            <!-- Cash on Delivery -->
+            <div id="cod" class="tab-content">
+
+                <!-- COD Info Banner -->
+                <div class="cod-banner">
+                    <div class="cod-badge">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Pay with Cash on Delivery</span>
+                    </div>
+
+                    <p class="cod-desc">
+                        Prefer paying in cash? No problem — choose Cash on Delivery and pay directly when your package arrives.  
+                        Please note: for security reasons, COD is available only for orders up to <strong>₹{{ cod_min_order_amount }}</strong>.
+                    </p>
+                </div>
+
+                <!-- COD Message -->
+                <div class="cod-message">
+                    <ul>
+                        <li><i class="fas fa-box-open"></i> Pay in cash when your order is delivered.</li>
+                        <li><i class="fas fa-mobile-alt"></i> OTP verification may be required for order confirmation.</li>
+                        <li><i class="fas fa-info-circle"></i> COD unavailable for orders above ₹{{ cod_min_order_amount }} — please select Online Payment or Wallet.</li>
+                    </ul>
+                </div>
+
+                <!-- COD Button -->
+                <form action="{% url 'place-order' order.uuid %}" method="post">
+                    {% csrf_token %}
+                    {% if order.grand_total > cod_min_order_amount %}
+                    <p class="cod-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        COD is available only for orders up to ₹{{ cod_min_order_amount }}.
+                    </p>
+                    {% endif %}
+                    <input type="hidden" name="payment_method" value="COD">
+                    <button class="cod-pay-btn btn-pay" {% if order.grand_total >= cod_min_order_amount %}disabled{% endif %}>
+                        <i class="fas fa-money-bill-wave"></i> Place Order with Cash on Delivery
+                    </button>
+                </form>
+            </div>
+
+            
+            <!-- Wallet -->
+            <div id="wallet" class="tab-content">
+
+                <!-- Wallet Info Banner -->
+                <div class="wallet-banner">
+                    <div class="wallet-secure-badge">
+                        <i class="fas fa-wallet"></i>
+                        <span>Fast & Secure Wallet Payment</span>
+                    </div>
+
+                    <p class="wallet-desc">
+                        Use your wallet balance for instant payments without entering any bank or card details.
+                        Wallet payments are processed immediately with zero additional charges.
+                    </p>
+                </div>
+
+                <!-- Wallet Balance Card -->
+                <div class="wallet-balance-card">
+                    <div class="wallet-balance-left">
+                        <p class="wallet-label">Available Balance</p>
+                        <h3 class="wallet-amount">₹{{ wallet.balance }}</h3>
+                    </div>
+
+                    <div class="wallet-balance-right">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+
+                {% if wallet.balance >= order.grand_total %}
+                <!-- Wallet Payment Breakdown -->
+                <div class="wallet-breakdown">
+                    <div class="wallet-row">
+                        <span>Wallet Balance</span>
+                        <span>₹{{ wallet.balance }}</span>
+                    </div>
+
+                    <div class="wallet-row">
+                        <span>Order Total</span>
+                        <span style="color: red;">- ₹{{ order.grand_total }}</span>
+                    </div>
+
+                    <div class="wallet-row total">
+                        <span>Balance After Payment</span>
+                        <span>₹{{ wallet_balance_after_payment|floatformat:2 }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Wallet Trust Points -->
+                <ul class="wallet-trust-points">
+                    <li><i class="fas fa-check-circle"></i> Instant payment confirmation</li>
+                    <li><i class="fas fa-lock"></i> No card or UPI required</li>
+                    <li><i class="fas fa-undo"></i> Auto refund on cancellation</li>
+                </ul>
+
+                <!-- Warning (Optional: Show Only If Balance Is Low) -->
+                {% if wallet.balance < order.grand_total %}
+                <div class="wallet-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Insufficient wallet balance. Please add funds or choose another payment option.
+                </div>
+                {% endif %}
+
+                <!-- Wallet CTA -->
+                <button class="btn-pay wallet-pay-btn" onclick="openWalletConfirm()" {% if wallet.balance < order.grand_total %}disabled{% endif %}>
+                    <i class="fas fa-wallet"></i>
+                    Pay ₹{{ order.grand_total }} Using Wallet
+                </button>
+
+            </div>
+
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            
+            <div class="summary-row">
+                <span>Subtotal (2 items)</span>
+                <span>₹{{ order.sub_total }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Discount Applied</span>
+                <span class="discount-price">-₹{{ order.discount_total }}</span>
+            </div>
+
+            {% if order.coupon_applied %}
+            <div class="summary-row">
+                <span>Coupon Applied</span>
+                <span class="discount-price">-₹{{ order.coupon_discount_total }}</span>
+            </div>
+            {% endif %}
+
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>₹{{ order.delivery_total }}</span>
+            </div>
+
+            <div class="delivery-info">
+                <h4>Delivery Address</h4>
+                <div class="delivery-address">
+                    <p>{{ address.full_name }}</p>
+                    <p>{{ address.address_line }}, {{ address.city }}, {{ address.state }}, pin {{ address.pincode }}</p>
+                    <p>Phone: {{ address.phone }}, {{address.second_phone}}</p>
+                    <!-- <p>To: 123 Maple Street, Anytown, USA</p> -->
+                </div>
+                
+                <h4>Delivery Date</h4>
+                <div class="delivery-date">
+                    <i class="fas fa-truck"></i>
+                    <span>Estimated Delivery: {{ estimated_delivery }}</span>
+                </div>
+            </div>
+            
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>₹{{ order.grand_total }}</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Wallet Confirmation Modal -->
+<div class="wallet-confirm-overlay" id="walletConfirmModal">
+    <div class="wallet-confirm-box">
+        <h3>Confirm Wallet Payment</h3>
+
+        <p class="wallet-confirm-text">
+            You are about to pay <strong>₹{{ order.grand_total }}</strong> using your wallet balance.
+        </p>
+
+        <div class="wallet-confirm-actions">
+            <button class="wallet-cancel-btn" onclick="closeWalletConfirm()">Cancel</button>
+            <form action="{% url 'place-order' order.uuid %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="payment_method" value="WALLET">
+                <button type="submit" class="wallet-confirm-btn">
+                    Confirm Payment
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    csrf_token = '{{ csrf_token }}'
+    create_razorpay_order_url = "{% url 'create_razorpay_order' %}"
+    payment_failed_url = "{% url 'payment-failed' order.uuid %}"
+    order_id = '{{ order.id }}'
+</script>
+<!-- Razorpay's Javascript code. -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="{% static 'order/js/payment.js' %}"></script>
+
+{% endblock %}

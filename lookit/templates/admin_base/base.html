@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lookit Admin - Dashboard</title>
+    <!--Global CSS-->
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+
+    <!--Components CSS-->
+    <link rel="stylesheet" href="{% static 'admin/css/components/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/components/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/components/toast.css' %}">
+
+    <!-- Page-specific CSS -->
+    {% block styles %}{% endblock %}
+
+</head>
+
+<body>
+    <!-- Top Navbar -->
+    {% include 'admin_base/components/navbar.html' %}
+
+
+    <div class="container">
+        
+        <!-- Sidebar -->
+        {% include 'admin_base/components/sidebar.html' %}
+
+        <!-- Main Content  -->
+        {% block content %}{% endblock %}
+
+        <!-- toast for notification -->
+        {% include 'admin_base/components/toast.html' %}
+    </div>
+    
+
+    <!--Component JS-->
+    <script src="{% static 'admin/js/components/sidebar.js' %}"></script>
+    <script src="{% static 'admin/js/components/navbar.js' %}"></script>
+    <script src="{% static 'admin/js/components/toast.js' %}"></script>
+
+
+    <!-- Page-specific JS -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

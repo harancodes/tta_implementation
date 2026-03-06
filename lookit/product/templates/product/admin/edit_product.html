@@ -1,0 +1,399 @@
+{% extends 'admin_base/base.html' %}
+{% load static %}
+{% block styles %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'product/admin/css/edit_product.css' %}">
+<style>
+        /* jQuery validation error styling */
+    label.error {
+      color: red;
+      font-weight: normal;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    .validation-message.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+</style>
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'admin-list-products' %}">Products</a>
+        <span>/</span>
+        <a href="{% url 'admin-view-product' product.uuid %}">{{ product.name }}</a>
+        <span>/</span>
+        <span>Edit Product</span>
+    </div>
+
+    <!-- Page Title -->
+    <h1 class="page-title">Edit Product</h1>
+
+    <!-- Form Container -->
+    <div class="form-container">
+
+        <form action="{% url 'admin-edit-product' product.uuid %}"  method="post" enctype="multipart/form-data"  id="editProductForm">
+            {% csrf_token %}
+             <input type="hidden" name="_method" value="PUT">
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h2 class="section-title">Basic Information</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" name="name" value="{{ product.name }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"
+                          required>{{ product.description }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Brand</label>
+                        <input type="text" id="brand" name="brand" value="{{ product.brand }}" placeholder="Enter Brand Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="colorBase">Color Base</label>
+                        <select id="colorBase" name="base_color" required>
+                            <option value="" disabled>Name for filtering</option>
+                            <option value="white" {% if product.base_color == 'white' %}selected{% endif %}>White</option>
+                            <option value="black" {% if product.base_color == 'black' %}selected{% endif %}>Black</option>
+                            <option value="beige" {% if product.base_color == 'beige' %}selected{% endif %}>Beige</option>
+                            <option value="green" {% if product.base_color == 'green' %}selected{% endif %}>Green</option>
+                            <option value="blue" {% if product.base_color == 'blue' %}selected{% endif %}>Blue</option>
+                            <option value="red" {% if product.base_color == 'red' %}selected{% endif %}>Red</option>
+                            <option value="orange" {% if product.base_color == 'orange' %}selected{% endif %}>Orange</option>
+                            <option value="grey" {% if product.base_color == 'grey' %}selected{% endif %}>Grey</option>
+                            <option value="yellow" {% if product.base_color == 'yellow' %}selected{% endif %}>Yellow</option>
+                            <option value="brown" {% if product.base_color == 'brown' %}selected{% endif %}>Brown</option>
+                            <option value="purple" {% if product.base_color == 'purple' %}selected{% endif %}>Purple</option>
+                            <option value="pink" {% if product.base_color == 'pink' %}selected{% endif %}>Pink</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="form-section">
+                <h2 class="section-title">Category</h2>
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="" disabled>Select Category</option>
+                            <option value="men" {% if product.category == 'men' %}selected{% endif %}>Men</option>
+                            <option value="women" {% if product.category == 'women' %}selected{% endif %}>Women</option>
+                            <option value="kids" {% if product.category == 'kids' %}selected{% endif %}>Kids</option>
+                            <!-- <option value="unisex" {% if product.category == 'unisex' %}selected{% endif %}>Unisex</option> -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" class="select2" name="style" required>
+                            <option value="" disabled>Select Style</option>
+                            {% for style in styles %}
+                            <option value="{{ style.name }}" {% if product.style.id == style.id %}selected{% endif %}>{{ style.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-section">
+                <h2 class="section-title optional">Additional Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="material">Material</label>
+                        <input type="text" id="material" name="material" value="{{ product.material }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="fit">Fit</label>
+                        <input type="text" id="fit" name="fit" value="{{ product.fit }}">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="careInstructions">Care Instructions</label>
+                        <input type="text" id="careInstructions" name="care_instructions"
+                            value="{{ product.care_instructions }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="form-section">
+                <h2 class="section-title">Price</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="basePrice">Price</label>
+                        <input type="number" id="basePrice" name="price" value="{{ product.price }}" step="0.01" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images & Media -->
+            <div class="form-section">
+                <h2 class="section-title">Images & Media</h2>
+                <div class="form-grid">
+
+                    <!-- Current Thumbnail Image -->
+                    <div class="form-group full-width">
+                        <label class="current-image-label">Current Thumbnail Image</label>
+                        <div class="image-preview-container">
+                            <div class="thumbnail-preview">
+                                <img src="{{ product.image_url }}"
+                                    alt="Thumbnail" id="thumbnailImage">
+                                <button type="button" class="replace-btn"
+                                    onclick="document.getElementById('thumbnailInput').click()">Replace</button>
+                                <input type="file" name="image" id="thumbnailInput" value="{{ product.image_url }}" accept="image/*" style="display: none;"
+                                    onchange="handleThumbnailReplace(event)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="validation-message error" id="thumbnailErrorMsg" style="display:none;"></div>
+
+
+                    <!--for preserving old image if it not replaced-->
+                    <input type="hidden" name="old_image_url" value="{{ product.image_url }}">
+
+
+                    <!-- Current Additional Images -->
+                    <div class="form-group full-width">
+                        <label class="current-image-label">Current Additional Images</label>
+
+                        <!--Display additional images-->
+                        <div class="additional-images-grid" id="additionalImagesGrid">
+
+                            {% for image in additional_images %}
+                            <div class="additional-image-item">
+                                <img src="{{ image.image_url }}"
+                                    alt="Additional Image 1">
+                                <button type="button" class="remove-image-btn" onclick="removeAdditionalImage(this)"
+                                    title="Remove image">×</button>
+                                <input type="hidden" value="preserve" name="{{image.id}}">
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="additional-images-grid" id="newAdditionalImagesGrid">
+                        </div>
+
+                        <div class="validation-message error" id="additionalErrorMsg" style="display:none;"></div>
+
+
+                        <!--add additional images-->
+                        <div class="add-images-area" id="addImagesArea"
+                            onclick="document.getElementById('additionalInput').click()">
+                            <div class="upload-text">Click or drag and drop to add more images</div>
+                            <button type="button" class="upload-btn">Add Images</button>
+                            <input type="file" name="additional_images" id="additionalInput" accept="image/*" multiple style="display: none;"
+                                onchange="handleAdditionalImagesAdd(event)">
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{% url 'admin-view-product' product.uuid %}">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </a>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="{% static 'product/admin/js/edit_product.js' %}"></script>
+
+<!--form validation-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script>
+  $.validator.addMethod("letterswithspaces", function (value, element) {
+    return this.optional(element) || /^[A-Za-z\s]+$/.test(value);
+  }, "Only letters and spaces allowed");
+
+  $.validator.addMethod("positiveNumber", function (value, element) {
+    return this.optional(element) || Number(value) > 0;
+  }, "Please enter a valid price");
+
+  $(document).ready(function () {
+
+    $("#editProductForm").validate({
+      ignore: [], // IMPORTANT: validates hidden fields like file inputs
+
+      rules: {
+        name: {
+          required: true,
+          minlength: 2,
+          maxlength: 100
+        },
+        description: {
+          required: true,
+          minlength: 10,
+        },
+        brand: {
+          required: true,
+          minlength: 2,
+          maxlength: 50,
+          letterswithspaces: true
+        },
+        base_color: {
+          required: true
+        },
+        category: {
+          required: true
+        },
+        style: {
+          required: true
+        },
+        material: {
+          minlength: 2,
+          maxlength: 50,
+        },
+        fit: {
+          minlength: 2,
+          maxlength: 50,
+        },
+        care_instructions: {
+          maxlength: 150
+        },
+        price: {
+          required: true,
+          number: true,
+          positiveNumber: true
+        },
+
+      },
+
+      messages: {
+        name: {
+          required: "Product name is required",
+          minlength: "Enter at least 2 characters",
+          maxlength: "Max 100 characters allowed"
+        },
+        description: {
+          required: "Description is required",
+          minlength: "Description must be at least 10 characters"
+        },
+        brand: {
+          required: "Brand is required",
+          minlength: "Brand must be at least 2 characters",
+          maxlength: "Brand name too long",
+          letterswithspaces: "Brand name can only contain letters"
+        },
+        base_color: {
+          required: "Select a base color"
+        },
+        category: {
+          required: "Select category"
+        },
+        style: {
+          required: "Select style"
+        },
+        material: {
+          minlength: "Minimum 2 characters",
+          maxlength: "Maximum 50 characters"
+        },
+        fit: {
+          minlength: "Minimum 2 characters",
+          maxlength: "Maximum 50 characters"
+        },
+        care_instructions: {
+          maxlength: "Max 150 characters allowed"
+        },
+        price: {
+          required: "Price is required",
+          number: "Enter a valid number",
+          positiveNumber: "Price must be greater than 0"
+        },
+        image: {
+          required: "Upload a thumbnail image",
+          accept: "Only image files allowed"
+        },
+        additional_images: {
+          required: "Upload at least 2 additional images",
+          accept: "Only image files allowed"
+        }
+      },
+
+      errorClass: "error",
+      errorElement: "label",
+
+      errorPlacement: function (error, element) {
+        if (element.attr("type") === "file") {
+          error.appendTo(element.closest(".form-group"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+
+      submitHandler: function (form) {
+
+        const thumbnailInput = document.getElementById('thumbnailInput');
+        const thumbnailReplaced = thumbnailInput.files.length > 0;
+        const hasExistingThumbnail = !!document.getElementById('thumbnailImage');
+
+        const preservedImages = document.querySelectorAll('.additional-image-item input[value="preserve"]').length;
+        const newlyAddedImages = document.getElementById('additionalInput').files.length;
+        const totalAdditional = preservedImages + newAdditionalImagesCount;
+
+        let isValid = true;
+
+        // Reset messages first
+        $("#thumbnailErrorMsg").hide().text("");
+        $("#additionalErrorMsg").hide().text("");
+
+        // Thumbnail validation
+        if (!thumbnailReplaced && !hasExistingThumbnail) {
+          $("#thumbnailErrorMsg").text("Please upload a thumbnail image").show();
+          isValid = false;
+        }
+
+        // Additional images validation
+        if (totalAdditional < 2) {
+          $("#additionalErrorMsg").text("At least 2 additional images are required").show();
+          isValid = false;
+        }
+        console.log(preservedImages, newAdditionalImagesCount)
+        console.log(totalAdditional)
+        if (totalAdditional > 5) {
+          $("#additionalErrorMsg").text("You can upload a maximum of 5 additional images").show();
+          isValid = false;
+        }
+
+        if (!isValid) return false;
+
+        form.submit();
+      }
+
+    });
+
+  });
+</script>
+
+{% endblock %}
