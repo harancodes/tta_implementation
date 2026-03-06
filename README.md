@@ -1,12 +1,3 @@
-Here is a **clean rewritten version** that clearly explains:
-
-* This project was **originally cloned from another repository**
-* You are using it for **architecture implementation**
-* Deployment target is **AWS EKS with two-tier architecture**
-
-I also made it sound **more professional for GitHub documentation**.
-
----
 
 # Lookit – E-Commerce Website (Two-Tier Architecture on AWS EKS)
 
